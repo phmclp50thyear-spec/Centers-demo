@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CI v2 - Restored Glow Edition</title>
+    <title>CI v2 - Full Glow Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -18,11 +18,10 @@
             left: -155px; top: 0; z-index: 100;
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        #sidebar:hover { left: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
-        
+        #sidebar:hover { left: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
         #sidebar::after {
             content: ""; position: absolute; right: 0; top: 0; bottom: 0;
-            width: 5px; background: #4f46e5; opacity: 0.3;
+            width: 5px; background: #4f46e5; opacity: 0.5;
         }
 
         .dept-btn {
@@ -32,7 +31,7 @@
             text-align: center; transition: all 0.2s;
         }
         .dept-btn:hover { color: #fff; border-color: #4f46e5; }
-        .dept-btn.active { color: #fff; background: #0a0a1a; border-color: #6366f1; box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
+        .dept-btn.active { color: #fff; background: #0a0a1a; border-color: #6366f1; box-shadow: 0 0 15px rgba(99, 102, 241, 0.6); }
 
         /* ANIMATIONS & GLOWS */
         #dashboard-content { transition: transform 0.4s ease, opacity 0.4s ease; padding: 20px; height: 100vh; display: flex; flex-direction: column; }
@@ -40,29 +39,30 @@
         .slide-in { animation: slideInEffect 0.5s ease-out forwards; }
         @keyframes slideInEffect { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
+        /* PULSING HEADER */
         .pulse-text { animation: neonPulse 2s infinite ease-in-out; }
         @keyframes neonPulse {
-            0%, 100% { text-shadow: 0 0 5px rgba(99,102,241,0.2); opacity: 0.7; }
-            50% { text-shadow: 0 0 15px rgba(99,102,241,1), 0 0 30px rgba(99,102,241,0.5); opacity: 1; }
+            0%, 100% { text-shadow: 0 0 10px rgba(99, 102, 241, 0.4); opacity: 0.8; }
+            50% { text-shadow: 0 0 25px rgba(99, 102, 241, 0.9), 0 0 40px rgba(99, 102, 241, 0.4); opacity: 1; }
         }
 
-        .neon-card { background: #070707; border-radius: 12px; border: 1px solid #1a1a1a; position: relative; }
-        .glow-indigo { border-color: #4f46e5; box-shadow: 0 0 20px rgba(79, 70, 229, 0.15); }
-        .glow-border { border-color: #1a1a1a; transition: border-color 0.3s; }
-        .glow-border:hover { border-color: #333; box-shadow: 0 0 15px rgba(255,255,255,0.03); }
-        
-        .chart-box { height: 100%; width: 100%; padding: 8px; }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        /* CARD NEON GLOWS */
+        .neon-card { 
+            background: #080808; 
+            border-radius: 12px; 
+            border: 1px solid #4f46e5; 
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.15);
+            transition: all 0.3s ease;
+        }
+        .neon-card:hover {
+            box-shadow: 0 0 25px rgba(79, 70, 229, 0.25);
+            border-color: #6366f1;
+        }
+
+        .chart-box { height: 100%; width: 100%; padding: 10px; }
     </style>
 </head>
 <body class="flex">
-
-    <div id="loader" class="fixed inset-0 bg-black z-[300] flex flex-col items-center justify-center">
-        <div class="w-48 bg-neutral-900 h-0.5 mb-4 rounded-full overflow-hidden">
-            <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500"></div>
-        </div>
-        <p class="text-[8px] font-black tracking-widest text-indigo-400 uppercase">Restoring Glow Protocols...</p>
-    </div>
 
     <aside id="sidebar">
         <div class="p-6 flex justify-center border-b border-neutral-900"><i data-lucide="layout-grid" class="text-indigo-500 w-5 h-5"></i></div>
@@ -71,31 +71,31 @@
         </div>
     </aside>
 
-    <main class="flex-1 h-screen overflow-hidden">
+    <main class="flex-1 h-screen">
         <div id="dashboard-content">
             
             <header class="flex justify-between items-center h-10 mb-4">
-                <h1 class="text-xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500">Intelligence</span></h1>
+                <h1 class="text-2xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500">Intelligence</span></h1>
                 <div class="text-right">
-                    <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-lg pulse-text">GLOBAL OVERVIEW</p>
+                    <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-xl pulse-text">GLOBAL OVERVIEW</p>
                 </div>
             </header>
 
-            <div class="grid grid-cols-5 gap-4 h-24 mb-4">
-                <div class="neon-card col-span-1 p-4 glow-indigo border-l-4 border-l-indigo-500 flex flex-col justify-center">
+            <div class="grid grid-cols-5 gap-4 h-28 mb-4">
+                <div class="neon-card col-span-1 p-5 border-l-4 border-l-indigo-500 flex flex-col justify-center">
                     <p class="text-[8px] font-black text-indigo-400 uppercase tracking-widest">Census</p>
-                    <h2 id="totalCensus" class="text-4xl font-black tracking-tighter">0</h2>
+                    <h2 id="totalCensus" class="text-5xl font-black tracking-tighter">0</h2>
                 </div>
-                <div class="neon-card col-span-4 p-4 glow-border flex items-center">
-                    <div id="typeStats" class="flex gap-10"></div>
+                <div class="neon-card col-span-4 p-5 flex items-center">
+                    <div id="typeStats" class="flex gap-12 overflow-hidden"></div>
                 </div>
             </div>
 
-            <div class="flex-1 grid grid-cols-2 gap-4 min-h-0">
-                <div class="neon-card glow-border"><div class="chart-box"><canvas id="locChart"></canvas></div></div>
-                <div class="neon-card glow-border"><div class="chart-box"><canvas id="ageChart"></canvas></div></div>
-                <div class="neon-card glow-border"><div class="chart-box"><canvas id="genderChart"></canvas></div></div>
-                <div class="neon-card glow-border"><div class="chart-box"><canvas id="civilChart"></canvas></div></div>
+            <div class="flex-1 grid grid-cols-2 gap-4 min-h-0 pb-2">
+                <div class="neon-card"><div class="chart-box"><canvas id="locChart"></canvas></div></div>
+                <div class="neon-card"><div class="chart-box"><canvas id="ageChart"></canvas></div></div>
+                <div class="neon-card"><div class="chart-box"><canvas id="genderChart"></canvas></div></div>
+                <div class="neon-card"><div class="chart-box"><canvas id="civilChart"></canvas></div></div>
             </div>
         </div>
     </main>
@@ -115,12 +115,10 @@
                 const { data, error } = await sb.from('patients').select('*').range(page * 1000, (page + 1) * 1000 - 1);
                 if (error || !data || data.length === 0) break;
                 rows = [...rows, ...data]; page++;
-                document.getElementById('progressBar').style.width = `${(rows.length / 18841) * 100}%`;
                 if (data.length < 1000) break;
             }
             masterData = rows.filter(r => r.location !== '#NAME?' && r.department !== '#NAME?');
             setupSidebar();
-            document.getElementById('loader').classList.add('hidden');
             render('all', false);
         }
 
@@ -143,7 +141,6 @@
             render(dept, true);
             content.classList.remove('slide-out');
             content.classList.add('slide-in');
-            setTimeout(() => content.classList.remove('slide-in'), 500);
         }
 
         function animateNumber(el, target) {
@@ -187,9 +184,9 @@
                 const s = Object.entries(o).sort((a,b) => b[1]-a[1]).slice(0, 6);
                 return { l: s.map(x => x[0]), v: s.map(x => x[1]) };
             };
-            draw('locChart', 'bar', getSet('location'), 'Locations', '#6366f1', animate);
+            draw('locChart', 'bar', getSet('location'), 'Hotspot Locations', '#6366f1', animate);
             draw('ageChart', 'bar', getSet('age_bracket'), 'Age Ranges', '#10b981', animate);
-            draw('genderChart', 'doughnut', getSet('gender'), 'Gender', chartColors, animate);
+            draw('genderChart', 'doughnut', getSet('gender'), 'Gender Split', chartColors, animate);
             draw('civilChart', 'pie', getSet('civil_status'), 'Civil Status', chartColors, animate);
         }
 
