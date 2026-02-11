@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Analytics - Sidebar Pop-up</title>
+    <title>Neon Command - Typography Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -11,9 +11,9 @@
     <style>
         body { background-color: #020202; color: #e5e5e5; overflow: hidden; }
         
-        /* SIDEBAR STRUCTURE */
+        /* SIDEBAR - Wider for Names */
         #sidebar {
-            width: 70px;
+            width: 140px;
             border-right: 1px solid #1a1a1a;
             background: #050505;
             display: flex;
@@ -27,74 +27,57 @@
             flex-grow: 1;
             overflow-y: auto;
             scrollbar-width: none;
+            padding: 10px;
         }
         #deptList::-webkit-scrollbar { display: none; }
 
-        /* NEON SIDEBAR BUTTONS */
+        /* TYPOGRAPHY BUTTONS WITH NEON BORDERS */
         .dept-btn {
-            position: relative; /* Crucial for absolute label positioning */
-            display: flex;
-            align-items: center;
-            justify-content: center;
             width: 100%;
-            height: 60px;
-            color: #444;
+            padding: 12px 8px;
+            margin-bottom: 8px;
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 8px;
+            color: #666;
+            font-size: 9px;
+            font-weight: 800;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 1px;
             transition: all 0.3s ease;
-            flex-shrink: 0;
+            cursor: pointer;
         }
 
         .dept-btn:hover { 
             color: #fff; 
-            background: #0f0f0f;
-            box-shadow: inset 0 0 15px rgba(99, 102, 241, 0.2);
+            border-color: #4f46e5;
+            box-shadow: 0 0 15px rgba(79, 70, 229, 0.4);
+            transform: translateY(-2px);
         }
         
         .dept-btn.active { 
-            color: #6366f1; 
-            background: #0a0a1a; 
-            border-right: 4px solid #6366f1;
-            filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.6));
+            color: #fff; 
+            background: #0a0a1a;
+            border-color: #6366f1;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
         }
 
-        /* SIDEWAY POP-UP LABEL */
-        .dept-label {
-            position: absolute;
-            left: 75px; /* Appears just to the right of the sidebar */
-            background: #6366f1;
-            color: white;
-            padding: 6px 14px;
-            border-radius: 6px;
-            font-size: 10px;
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            white-space: nowrap;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateX(-10px);
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            pointer-events: none;
-            z-index: 200;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
-        }
-
-        .dept-btn:hover .dept-label {
-            opacity: 1;
-            visibility: visible;
-            transform: translateX(5px);
-        }
-
-        /* NEON CARDS */
+        /* MAIN NEON CARDS */
         .neon-card { 
             background: #080808; 
-            border-radius: 20px; 
+            border-radius: 16px; 
             border: 1px solid #1a1a1a; 
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
         }
+        
+        /* Pulsing Border Glows */
         .glow-indigo { border-color: #4f46e5; box-shadow: 0 0 25px rgba(79, 70, 229, 0.2); }
-        .glow-multi { border-color: #222; }
-        .glow-multi:hover { border-color: #333; box-shadow: 0 0 20px rgba(255, 255, 255, 0.05); }
+        .glow-emerald { border-color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); }
+        .glow-amber { border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); }
+        .glow-rose { border-color: #f43f5e; box-shadow: 0 0 20px rgba(244, 63, 94, 0.15); }
 
+        .neon-card:hover { transform: translateY(-5px); border-color: #ffffff33; }
     </style>
 </head>
 <body class="flex">
@@ -103,62 +86,58 @@
         <div class="w-64 bg-neutral-900 h-1 mb-4 overflow-hidden rounded-full">
             <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500 shadow-[0_0_15px_#6366f1]"></div>
         </div>
-        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase italic">Filtering Patient Data...</p>
+        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Sanitizing 2026 Database...</p>
     </div>
 
     <aside id="sidebar">
-        <div class="h-[70px] flex items-center justify-center border-b border-neutral-900 flex-shrink-0">
-            <div class="h-9 w-9 bg-indigo-600 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(79,70,229,0.5)]">
-                <i data-lucide="activity" class="text-white w-5 h-5"></i>
+        <div class="p-6 flex justify-center border-b border-neutral-900">
+            <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.5)]">
+                <i data-lucide="shield-plus" class="text-white w-6 h-6"></i>
             </div>
         </div>
         
         <div id="deptList">
-            <button onclick="filterDept('all', this)" class="dept-btn active">
-                <i data-lucide="layout-grid"></i>
-                <span class="dept-label">Full Overview</span>
-            </button>
+            <button onclick="filterDept('all', this)" class="dept-btn active">Overview</button>
             </div>
 
-        <div class="mt-auto border-t border-neutral-900 p-6 flex justify-center flex-shrink-0">
-            <button onclick="location.reload()" class="text-neutral-700 hover:text-white transition-colors">
-                <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+        <div class="mt-auto p-4 border-t border-neutral-900 flex justify-center">
+            <button onclick="location.reload()" class="text-neutral-600 hover:text-white transition-all">
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
             </button>
         </div>
     </aside>
 
-    <main class="flex-1 ml-[70px] overflow-y-auto h-screen p-8 bg-[#010101]">
+    <main class="flex-1 ml-[140px] overflow-y-auto h-screen p-8 bg-[#010101]">
         
         <header class="flex justify-between items-end mb-10">
             <div>
-                <h1 class="text-3xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500 italic">Command</span></h1>
-                <p id="syncInfo" class="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mt-1">Live Feed: 18,841 Records</p>
+                <h1 class="text-3xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500">Intelligence</span></h1>
+                <p id="syncInfo" class="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mt-1 italic">Clean Sync: Successful</p>
             </div>
             <div class="text-right">
-                <p class="text-[9px] text-neutral-600 font-black uppercase tracking-[0.2em]">Active Filter</p>
-                <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-sm">GLOBAL ANALYSIS</p>
+                <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-xs tracking-widest border-b border-indigo-900/50 pb-1">GLOBAL VIEW</p>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div class="neon-card p-8 glow-indigo border-l-4">
-                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Total Patient Census</p>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            <div class="neon-card p-8 glow-indigo lg:col-span-1">
+                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Aggregate Census</p>
                 <h2 id="totalCensus" class="text-7xl font-black mt-2 tracking-tighter">0</h2>
             </div>
-            <div class="neon-card p-8 border-l-4 border-neutral-800 glow-multi">
-                <p class="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Type Distribution</p>
-                <div id="typeStats" class="flex flex-wrap gap-8 mt-4"></div>
+            <div class="neon-card p-8 glow-emerald lg:col-span-2">
+                <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Active Classifications</p>
+                <div id="typeStats" class="flex flex-wrap gap-10 mt-6"></div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="neon-card p-6 h-[420px] glow-multi"><canvas id="locChart"></canvas></div>
-            <div class="neon-card p-6 h-[420px] glow-multi"><canvas id="ageChart"></canvas></div>
+            <div class="neon-card p-6 h-[400px] glow-amber"><canvas id="locChart"></canvas></div>
+            <div class="neon-card p-6 h-[400px] glow-rose"><canvas id="ageChart"></canvas></div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="neon-card p-6 h-[350px] glow-multi"><canvas id="genderChart"></canvas></div>
-            <div class="neon-card p-6 h-[350px] glow-multi"><canvas id="civilChart"></canvas></div>
+            <div class="neon-card p-6 h-[350px] glow-indigo"><canvas id="genderChart"></canvas></div>
+            <div class="neon-card p-6 h-[350px] glow-emerald"><canvas id="civilChart"></canvas></div>
         </div>
     </main>
 
@@ -168,15 +147,6 @@
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const chartColors = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#3b82f6', '#f97316'];
-        
-        // Icon mapping
-        const iconMap = {
-            'cardiology': 'heart', 'emergency': 'zap', 'pediatrics': 'baby',
-            'orthopedics': 'bone', 'radiology': 'scan', 'neurology': 'brain',
-            'surgery': 'scissors', 'dental': 'smile', 'laboratory': 'beaker',
-            'pharmacy': 'pill', 'default': 'box'
-        };
-
         let masterData = [], charts = {};
 
         async function init() {
@@ -186,11 +156,11 @@
                 const { data, error } = await sb.from('patients').select('*').range(page * 1000, (page + 1) * 1000 - 1);
                 if (error || !data || data.length === 0) break;
                 rows = [...rows, ...data]; page++;
-                document.getElementById('progressBar').style.width = `${(rows.length / 18841) * 100}%`;
+                document.getElementById('progressBar').style.width = `${(rows.length / 19000) * 100}%`;
                 if (data.length < 1000) break;
             }
 
-            // AUTO-DELETE #NAME?
+            // FILTER: Auto-delete #NAME?
             masterData = rows.filter(r => r.location !== '#NAME?' && r.department !== '#NAME?' && r.patient_type !== '#NAME?');
 
             setupSidebar();
@@ -205,12 +175,10 @@
             depts.forEach(d => {
                 const btn = document.createElement('button');
                 btn.className = 'dept-btn';
+                btn.textContent = d;
                 btn.onclick = () => filterDept(d, btn);
-                const iconName = iconMap[d.toLowerCase()] || iconMap['default'];
-                btn.innerHTML = `<i data-lucide="${iconName}"></i><span class="dept-label">${d}</span>`;
                 list.appendChild(btn);
             });
-            lucide.createIcons();
         }
 
         function filterDept(dept, el) {
@@ -227,7 +195,7 @@
             const types = {};
             filtered.forEach(d => { types[d.patient_type || 'Other'] = (types[d.patient_type || 'Other'] || 0) + 1; });
             document.getElementById('typeStats').innerHTML = Object.entries(types).map(([t, c], i) => `
-                <div><span class="text-[9px] font-black text-neutral-500 uppercase">${t}</span>
+                <div><span class="text-[9px] font-black text-neutral-500 uppercase tracking-tighter">${t}</span>
                 <p class="text-2xl font-black" style="color:${chartColors[i % chartColors.length]}">${c.toLocaleString()}</p></div>
             `).join('');
 
@@ -238,10 +206,10 @@
             };
 
             const l = getSet('location'), a = getSet('age_bracket'), g = getSet('gender'), civ = getSet('civil_status');
-            draw('locChart', 'bar', l.l, [{ label: 'Census', data: l.v, backgroundColor: chartColors }], 'Locations');
-            draw('ageChart', 'bar', a.l, [{ label: 'Census', data: a.v, backgroundColor: [...chartColors].reverse() }], 'Age Range');
-            draw('genderChart', 'doughnut', g.l, [{ data: g.v, backgroundColor: chartColors, borderWidth: 0 }], 'Gender');
-            draw('civilChart', 'pie', civ.l, [{ data: civ.v, backgroundColor: chartColors, borderWidth: 0 }], 'Civil Status');
+            draw('locChart', 'bar', l.l, [{ label: 'Census', data: l.v, backgroundColor: chartColors }], 'Regional Hotspots');
+            draw('ageChart', 'bar', a.l, [{ label: 'Census', data: a.v, backgroundColor: [...chartColors].reverse() }], 'Age Demographics');
+            draw('genderChart', 'doughnut', g.l, [{ data: g.v, backgroundColor: chartColors, borderWidth: 0 }], 'Gender Split');
+            draw('civilChart', 'pie', civ.l, [{ data: civ.v, backgroundColor: chartColors, borderWidth: 0 }], 'Status Analysis');
         }
 
         function draw(id, type, labels, datasets, title) {
@@ -252,11 +220,11 @@
                     responsive: true, maintainAspectRatio: false,
                     plugins: { 
                         legend: { position: 'bottom', labels: { color: '#555', font: { size: 9, weight: 'bold' } } },
-                        title: { display: true, text: title.toUpperCase(), color: '#fff', font: { size: 10, weight: '900' }, padding: 15 }
+                        title: { display: true, text: title.toUpperCase(), color: '#fff', font: { size: 11, weight: '900' }, padding: 15 }
                     },
                     scales: (type === 'bar') ? {
                         y: { grid: { color: '#111' }, ticks: { color: '#444' } },
-                        x: { grid: { display: false }, ticks: { color: '#444' } }
+                        x: { grid: { display: false }, ticks: { color: '#444', font: { size: 8 } } }
                     } : {}
                 }
             });
