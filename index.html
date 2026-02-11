@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Command - Full Animation</title>
+    <title>Neon Command - Pulse Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -30,7 +30,7 @@
         .dept-btn:hover { color: #fff; border-color: #4f46e5; box-shadow: 0 0 15px rgba(79, 70, 229, 0.4); }
         .dept-btn.active { color: #fff; background: #0a0a1a; border-color: #6366f1; box-shadow: 0 0 20px rgba(99, 102, 241, 0.6); }
 
-        /* EFFECT 1: SLIDE ANIMATIONS */
+        /* DASHBOARD TRANSITIONS */
         #dashboard-content {
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
             opacity: 1; transform: translateX(0);
@@ -43,6 +43,17 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
+        /* NEON PULSE ANIMATION */
+        .pulse-text {
+            animation: neonPulse 2s infinite ease-in-out;
+            text-shadow: 0 0 5px rgba(99, 102, 241, 0.2);
+        }
+
+        @keyframes neonPulse {
+            0%, 100% { text-shadow: 0 0 10px rgba(99, 102, 241, 0.4); opacity: 0.8; }
+            50% { text-shadow: 0 0 25px rgba(99, 102, 241, 0.9), 0 0 40px rgba(99, 102, 241, 0.4); opacity: 1; }
+        }
+
         .neon-card { background: #080808; border-radius: 16px; border: 1px solid #1a1a1a; }
         .glow-indigo { border-color: #4f46e5; box-shadow: 0 0 25px rgba(79, 70, 229, 0.2); }
     </style>
@@ -53,7 +64,7 @@
         <div class="w-64 bg-neutral-900 h-1 mb-4 overflow-hidden rounded-full">
             <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500 shadow-[0_0_15px_#6366f1]"></div>
         </div>
-        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Loading Data Engine...</p>
+        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Synchronizing Pulse Engines...</p>
     </div>
 
     <aside id="sidebar">
@@ -71,14 +82,18 @@
         <div id="dashboard-content">
             <header class="flex justify-between items-end mb-10">
                 <div>
-                    <h1 class="text-3xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500 italic">Intelligence</span></h1>
-                    <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-xs mt-1">GLOBAL VIEW</p>
+                    <h1 class="text-3xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500">Intelligence</span></h1>
+                    <p class="text-[9px] text-neutral-500 font-bold uppercase tracking-widest mt-1">Live Database Feed v2.0</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-[9px] text-neutral-600 font-black uppercase tracking-[0.2em]">Active Department</p>
+                    <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-2xl pulse-text">GLOBAL OVERVIEW</p>
                 </div>
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
                 <div class="neon-card p-10 glow-indigo border-l-4">
-                    <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Active Census</p>
+                    <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Total Patient Census</p>
                     <h2 id="totalCensus" class="text-8xl font-black mt-2 tracking-tighter">0</h2>
                 </div>
                 <div class="neon-card p-10 border-l-4 border-neutral-800">
@@ -148,7 +163,6 @@
             setTimeout(() => content.classList.remove('slide-in'), 600);
         }
 
-        // EFFECT 2: ROLLING NUMBER ENGINE
         function animateNumber(el, target) {
             let start = 0;
             const duration = 800;
@@ -164,20 +178,17 @@
 
         function render(dept, animate) {
             const filtered = dept === 'all' ? masterData : masterData.filter(d => d.department === dept);
-            
-            // Census Animation
+            document.getElementById('activeDeptLabel').textContent = dept === 'all' ? 'GLOBAL OVERVIEW' : dept.toUpperCase();
+
             const censusEl = document.getElementById('totalCensus');
             if (animate) animateNumber(censusEl, filtered.length);
             else censusEl.textContent = filtered.length.toLocaleString();
             
-            document.getElementById('activeDeptLabel').textContent = dept.toUpperCase();
-
-            // Type Animation
             const types = {};
             filtered.forEach(d => { types[d.patient_type || 'Other'] = (types[d.patient_type || 'Other'] || 0) + 1; });
             
             const statsContainer = document.getElementById('typeStats');
-            statsContainer.innerHTML = ''; // Clear for animation
+            statsContainer.innerHTML = '';
             Object.entries(types).forEach(([t, c], i) => {
                 const div = document.createElement('div');
                 div.innerHTML = `<span class="text-[9px] font-black text-neutral-500 uppercase">${t}</span>
@@ -197,10 +208,9 @@
                 return { l: s.map(x => x[0]), v: s.map(x => x[1]) };
             };
             const l = getSet('location'), a = getSet('age_bracket'), g = getSet('gender'), c = getSet('civil_status');
-            
-            draw('locChart', 'bar', l.l, l.v, 'Locations', chartColors, animate);
-            draw('ageChart', 'bar', a.l, a.v, 'Age Range', [...chartColors].reverse(), animate);
-            draw('genderChart', 'doughnut', g.l, g.v, 'Gender', chartColors, animate);
+            draw('locChart', 'bar', l.l, l.v, 'Hotspot Locations', chartColors, animate);
+            draw('ageChart', 'bar', a.l, a.v, 'Age Distribution', [...chartColors].reverse(), animate);
+            draw('genderChart', 'doughnut', g.l, g.v, 'Gender Split', chartColors, animate);
             draw('civilChart', 'pie', c.l, c.v, 'Civil Status', chartColors, animate);
         }
 
