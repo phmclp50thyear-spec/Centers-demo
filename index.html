@@ -3,99 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CI v2 - Full Glow Edition</title>
+    <title>Neon Command - Pulse Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background-color: #020202; color: #e5e5e5; overflow: hidden; height: 100vh; margin: 0; }
-
-        /* AUTO-HIDE SIDEBAR */
+        body { background-color: #020202; color: #e5e5e5; overflow: hidden; }
+        
         #sidebar {
-            width: 160px; border-right: 1px solid #1a1a1a; background: rgba(5, 5, 5, 0.98);
+            width: 140px; border-right: 1px solid #1a1a1a; background: #050505;
             display: flex; flex-direction: column; height: 100vh; position: fixed;
-            left: -155px; top: 0; z-index: 100;
-            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            left: 0; top: 0; z-index: 100;
         }
-        #sidebar:hover { left: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
-        #sidebar::after {
-            content: ""; position: absolute; right: 0; top: 0; bottom: 0;
-            width: 5px; background: #4f46e5; opacity: 0.5;
-        }
+
+        #deptList { flex-grow: 1; overflow-y: auto; scrollbar-width: none; padding: 10px; }
+        #deptList::-webkit-scrollbar { display: none; }
 
         .dept-btn {
-            width: 100%; padding: 10px 8px; margin-bottom: 4px; background: #080808;
-            border: 1px solid #151515; border-radius: 4px; color: #555;
-            font-size: 8px; font-weight: 800; text-transform: uppercase;
-            text-align: center; transition: all 0.2s;
+            width: 100%; padding: 12px 8px; margin-bottom: 8px; background: #0a0a0a;
+            border: 1px solid #1a1a1a; border-radius: 8px; color: #666;
+            font-size: 9px; font-weight: 800; text-transform: uppercase;
+            text-align: center; letter-spacing: 1px; transition: all 0.3s ease;
         }
-        .dept-btn:hover { color: #fff; border-color: #4f46e5; }
-        .dept-btn.active { color: #fff; background: #0a0a1a; border-color: #6366f1; box-shadow: 0 0 15px rgba(99, 102, 241, 0.6); }
 
-        /* ANIMATIONS & GLOWS */
-        #dashboard-content { transition: transform 0.4s ease, opacity 0.4s ease; padding: 20px; height: 100vh; display: flex; flex-direction: column; }
-        .slide-out { opacity: 0 !important; transform: translateX(-20px) !important; }
-        .slide-in { animation: slideInEffect 0.5s ease-out forwards; }
-        @keyframes slideInEffect { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+        .dept-btn:hover { color: #fff; border-color: #4f46e5; box-shadow: 0 0 15px rgba(79, 70, 229, 0.4); }
+        .dept-btn.active { color: #fff; background: #0a0a1a; border-color: #6366f1; box-shadow: 0 0 20px rgba(99, 102, 241, 0.6); }
 
-        /* PULSING HEADER */
-        .pulse-text { animation: neonPulse 2s infinite ease-in-out; }
+        /* DASHBOARD TRANSITIONS */
+        #dashboard-content {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            opacity: 1; transform: translateX(0);
+        }
+        .slide-out { opacity: 0 !important; transform: translateX(-30px) !important; }
+        .slide-in { animation: slideInEffect 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
+        
+        @keyframes slideInEffect {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* NEON PULSE ANIMATION */
+        .pulse-text {
+            animation: neonPulse 2s infinite ease-in-out;
+            text-shadow: 0 0 5px rgba(99, 102, 241, 0.2);
+        }
+
         @keyframes neonPulse {
             0%, 100% { text-shadow: 0 0 10px rgba(99, 102, 241, 0.4); opacity: 0.8; }
             50% { text-shadow: 0 0 25px rgba(99, 102, 241, 0.9), 0 0 40px rgba(99, 102, 241, 0.4); opacity: 1; }
         }
 
-        /* CARD NEON GLOWS */
-        .neon-card { 
-            background: #080808; 
-            border-radius: 12px; 
-            border: 1px solid #4f46e5; 
-            box-shadow: 0 0 15px rgba(79, 70, 229, 0.15);
-            transition: all 0.3s ease;
-        }
-        .neon-card:hover {
-            box-shadow: 0 0 25px rgba(79, 70, 229, 0.25);
-            border-color: #6366f1;
-        }
-
-        .chart-box { height: 100%; width: 100%; padding: 10px; }
+        .neon-card { background: #080808; border-radius: 16px; border: 1px solid #1a1a1a; }
+        .glow-indigo { border-color: #4f46e5; box-shadow: 0 0 25px rgba(79, 70, 229, 0.2); }
     </style>
 </head>
 <body class="flex">
 
+    <div id="loader" class="fixed inset-0 bg-black z-[300] flex flex-col items-center justify-center">
+        <div class="w-64 bg-neutral-900 h-1 mb-4 overflow-hidden rounded-full">
+            <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500 shadow-[0_0_15px_#6366f1]"></div>
+        </div>
+        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Synchronizing Pulse Engines...</p>
+    </div>
+
     <aside id="sidebar">
-        <div class="p-6 flex justify-center border-b border-neutral-900"><i data-lucide="layout-grid" class="text-indigo-500 w-5 h-5"></i></div>
-        <div id="deptList" class="flex-grow overflow-y-auto p-3 scrollbar-hide">
-            <button onclick="handleFilterChange('all', this)" class="dept-btn active">Global View</button>
+        <div class="p-6 flex justify-center border-b border-neutral-900">
+            <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_#4f46e5]">
+                <i data-lucide="activity" class="text-white w-6 h-6"></i>
+            </div>
+        </div>
+        <div id="deptList">
+            <button onclick="handleFilterChange('all', this)" class="dept-btn active">Overview</button>
         </div>
     </aside>
 
-    <main class="flex-1 h-screen">
+    <main class="flex-1 ml-[140px] overflow-y-auto h-screen p-8 bg-[#010101]">
         <div id="dashboard-content">
-            
-            <header class="flex justify-between items-center h-10 mb-4">
-                <h1 class="text-2xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500">Intelligence</span></h1>
+            <header class="flex justify-between items-end mb-10">
+                <div>
+                    <h1 class="text-3xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500">Intelligence</span></h1>
+                    <p class="text-[9px] text-neutral-500 font-bold uppercase tracking-widest mt-1">Live Database Feed v2.0</p>
+                </div>
                 <div class="text-right">
-                    <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-xl pulse-text">GLOBAL OVERVIEW</p>
+                    <p class="text-[9px] text-neutral-600 font-black uppercase tracking-[0.2em]">Active Department</p>
+                    <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-2xl pulse-text">GLOBAL OVERVIEW</p>
                 </div>
             </header>
 
-            <div class="grid grid-cols-5 gap-4 h-28 mb-4">
-                <div class="neon-card col-span-1 p-5 border-l-4 border-l-indigo-500 flex flex-col justify-center">
-                    <p class="text-[8px] font-black text-indigo-400 uppercase tracking-widest">Census</p>
-                    <h2 id="totalCensus" class="text-5xl font-black tracking-tighter">0</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="neon-card p-10 glow-indigo border-l-4">
+                    <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Total Patient Census</p>
+                    <h2 id="totalCensus" class="text-8xl font-black mt-2 tracking-tighter">0</h2>
                 </div>
-                <div class="neon-card col-span-4 p-5 flex items-center">
-                    <div id="typeStats" class="flex gap-12 overflow-hidden"></div>
+                <div class="neon-card p-10 border-l-4 border-neutral-800">
+                    <p class="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Type Classification</p>
+                    <div id="typeStats" class="flex flex-wrap gap-10 mt-6"></div>
                 </div>
             </div>
 
-            <div class="flex-1 grid grid-cols-2 gap-4 min-h-0 pb-2">
-                <div class="neon-card"><div class="chart-box"><canvas id="locChart"></canvas></div></div>
-                <div class="neon-card"><div class="chart-box"><canvas id="ageChart"></canvas></div></div>
-                <div class="neon-card"><div class="chart-box"><canvas id="genderChart"></canvas></div></div>
-                <div class="neon-card"><div class="chart-box"><canvas id="civilChart"></canvas></div></div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="neon-card p-6 h-[400px]"><canvas id="locChart"></canvas></div>
+                <div class="neon-card p-6 h-[400px]"><canvas id="ageChart"></canvas></div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="neon-card p-6 h-[350px]"><canvas id="genderChart"></canvas></div>
+                <div class="neon-card p-6 h-[350px]"><canvas id="civilChart"></canvas></div>
             </div>
         </div>
     </main>
@@ -104,7 +117,7 @@
         const SUPABASE_URL = 'https://onietgpyfgjahqjmjlud.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uaWV0Z3B5ZmdqYWhxam1qbHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3ODc3MzgsImV4cCI6MjA4NjM2MzczOH0.QYdZZpGSTQd4yZPnpIf8ozxC9yWL3nbGMX3do-Hb0SM';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const chartColors = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4'];
+        const chartColors = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#3b82f6', '#f97316'];
 
         let masterData = [], charts = {};
 
@@ -115,18 +128,22 @@
                 const { data, error } = await sb.from('patients').select('*').range(page * 1000, (page + 1) * 1000 - 1);
                 if (error || !data || data.length === 0) break;
                 rows = [...rows, ...data]; page++;
+                document.getElementById('progressBar').style.width = `${(rows.length / 18841) * 100}%`;
                 if (data.length < 1000) break;
             }
             masterData = rows.filter(r => r.location !== '#NAME?' && r.department !== '#NAME?');
             setupSidebar();
+            document.getElementById('loader').classList.add('hidden');
             render('all', false);
         }
 
         function setupSidebar() {
             const list = document.getElementById('deptList');
-            [...new Set(masterData.map(d => d.department))].filter(Boolean).sort().forEach(d => {
+            const depts = [...new Set(masterData.map(d => d.department))].filter(Boolean).sort();
+            depts.forEach(d => {
                 const btn = document.createElement('button');
-                btn.className = 'dept-btn'; btn.textContent = d;
+                btn.className = 'dept-btn';
+                btn.textContent = d;
                 btn.onclick = () => handleFilterChange(d, btn);
                 list.appendChild(btn);
             });
@@ -137,18 +154,23 @@
             content.classList.add('slide-out');
             document.querySelectorAll('.dept-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
+
             await new Promise(r => setTimeout(r, 400));
             render(dept, true);
+            
             content.classList.remove('slide-out');
             content.classList.add('slide-in');
+            setTimeout(() => content.classList.remove('slide-in'), 600);
         }
 
         function animateNumber(el, target) {
             let start = 0;
+            const duration = 800;
             const startTime = performance.now();
             function update(now) {
-                const progress = Math.min((now - startTime) / 600, 1);
-                el.textContent = Math.floor(start + progress * (target - start)).toLocaleString();
+                const progress = Math.min((now - startTime) / duration, 1);
+                const current = Math.floor(start + progress * (target - start));
+                el.textContent = current.toLocaleString();
                 if (progress < 1) requestAnimationFrame(update);
             }
             requestAnimationFrame(update);
@@ -156,23 +178,24 @@
 
         function render(dept, animate) {
             const filtered = dept === 'all' ? masterData : masterData.filter(d => d.department === dept);
-            document.getElementById('activeDeptLabel').textContent = dept.toUpperCase();
-            
+            document.getElementById('activeDeptLabel').textContent = dept === 'all' ? 'GLOBAL OVERVIEW' : dept.toUpperCase();
+
             const censusEl = document.getElementById('totalCensus');
             if (animate) animateNumber(censusEl, filtered.length);
             else censusEl.textContent = filtered.length.toLocaleString();
             
             const types = {};
             filtered.forEach(d => { types[d.patient_type || 'Other'] = (types[d.patient_type || 'Other'] || 0) + 1; });
+            
             const statsContainer = document.getElementById('typeStats');
             statsContainer.innerHTML = '';
             Object.entries(types).forEach(([t, c], i) => {
                 const div = document.createElement('div');
-                div.innerHTML = `<p class="text-[7px] font-black text-neutral-600 uppercase mb-1 tracking-widest">${t}</p>
-                                 <p id="t-cnt-${i}" class="text-xl font-black" style="color:${chartColors[i % chartColors.length]}">0</p>`;
+                div.innerHTML = `<span class="text-[9px] font-black text-neutral-500 uppercase">${t}</span>
+                                 <p id="type-count-${i}" class="text-2xl font-black" style="color:${chartColors[i % chartColors.length]}">0</p>`;
                 statsContainer.appendChild(div);
-                if (animate) animateNumber(document.getElementById(`t-cnt-${i}`), c);
-                else document.getElementById(`t-cnt-${i}`).textContent = c.toLocaleString();
+                if (animate) animateNumber(document.getElementById(`type-count-${i}`), c);
+                else document.getElementById(`type-count-${i}`).textContent = c.toLocaleString();
             });
 
             updateCharts(filtered, animate);
@@ -181,29 +204,30 @@
         function updateCharts(data, animate) {
             const getSet = (k) => {
                 const o = {}; data.forEach(d => { const v = d[k] || 'N/A'; o[v] = (o[v] || 0) + 1; });
-                const s = Object.entries(o).sort((a,b) => b[1]-a[1]).slice(0, 6);
+                const s = Object.entries(o).sort((a,b) => b[1]-a[1]).slice(0, 8);
                 return { l: s.map(x => x[0]), v: s.map(x => x[1]) };
             };
-            draw('locChart', 'bar', getSet('location'), 'Hotspot Locations', '#6366f1', animate);
-            draw('ageChart', 'bar', getSet('age_bracket'), 'Age Ranges', '#10b981', animate);
-            draw('genderChart', 'doughnut', getSet('gender'), 'Gender Split', chartColors, animate);
-            draw('civilChart', 'pie', getSet('civil_status'), 'Civil Status', chartColors, animate);
+            const l = getSet('location'), a = getSet('age_bracket'), g = getSet('gender'), c = getSet('civil_status');
+            draw('locChart', 'bar', l.l, l.v, 'Hotspot Locations', chartColors, animate);
+            draw('ageChart', 'bar', a.l, a.v, 'Age Distribution', [...chartColors].reverse(), animate);
+            draw('genderChart', 'doughnut', g.l, g.v, 'Gender Split', chartColors, animate);
+            draw('civilChart', 'pie', c.l, c.v, 'Civil Status', chartColors, animate);
         }
 
-        function draw(id, type, set, title, colors, animate) {
+        function draw(id, type, labels, data, title, colors, animate) {
             if (charts[id]) charts[id].destroy();
             charts[id] = new Chart(document.getElementById(id), {
-                type, data: { labels: set.l, datasets: [{ data: set.v, backgroundColor: colors, borderWidth: 0, borderRadius: type === 'bar' ? 4 : 0 }] },
+                type, data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: type === 'bar' ? 5 : 0, borderWidth: 0 }] },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    animation: { duration: animate ? 800 : 0 },
+                    animation: { duration: animate ? 1000 : 0, easing: 'easeOutQuart' },
                     plugins: { 
-                        legend: { position: 'right', labels: { color: '#666', font: { size: 7 }, boxWidth: 10 } },
-                        title: { display: true, text: title.toUpperCase(), color: '#aaa', font: { size: 9, weight: '900' } }
+                        legend: { position: 'bottom', labels: { color: '#555', font: { size: 9, weight: 'bold' } } },
+                        title: { display: true, text: title.toUpperCase(), color: '#fff', font: { size: 10, weight: '900' }, padding: 15 }
                     },
-                    scales: type === 'bar' ? {
-                        y: { ticks: { color: '#444', font: { size: 7 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
-                        x: { ticks: { color: '#444', font: { size: 7 } }, grid: { display: false } }
+                    scales: (type === 'bar') ? {
+                        y: { grid: { color: '#111' }, ticks: { color: '#444' } },
+                        x: { grid: { display: false }, ticks: { color: '#444', font: { size: 8 } } }
                     } : {}
                 }
             });
@@ -212,3 +236,4 @@
     </script>
 </body>
 </html>
+
