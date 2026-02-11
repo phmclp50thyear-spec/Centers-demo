@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Command - Typography Edition</title>
+    <title>Animated Neon Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -11,73 +11,41 @@
     <style>
         body { background-color: #020202; color: #e5e5e5; overflow: hidden; }
         
-        /* SIDEBAR - Wider for Names */
+        /* Sidebar Layout */
         #sidebar {
-            width: 140px;
-            border-right: 1px solid #1a1a1a;
-            background: #050505;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            position: fixed;
+            width: 140px; border-right: 1px solid #1a1a1a; background: #050505;
+            display: flex; flex-direction: column; height: 100vh; position: fixed;
             left: 0; top: 0; z-index: 100;
         }
 
-        #deptList {
-            flex-grow: 1;
-            overflow-y: auto;
-            scrollbar-width: none;
-            padding: 10px;
-        }
+        #deptList { flex-grow: 1; overflow-y: auto; scrollbar-width: none; padding: 10px; }
         #deptList::-webkit-scrollbar { display: none; }
 
-        /* TYPOGRAPHY BUTTONS WITH NEON BORDERS */
         .dept-btn {
-            width: 100%;
-            padding: 12px 8px;
-            margin-bottom: 8px;
-            background: #0a0a0a;
-            border: 1px solid #1a1a1a;
-            border-radius: 8px;
-            color: #666;
-            font-size: 9px;
-            font-weight: 800;
-            text-transform: uppercase;
-            text-align: center;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            cursor: pointer;
+            width: 100%; padding: 12px 8px; margin-bottom: 8px; background: #0a0a0a;
+            border: 1px solid #1a1a1a; border-radius: 8px; color: #666;
+            font-size: 9px; font-weight: 800; text-transform: uppercase;
+            text-align: center; letter-spacing: 1px; transition: all 0.3s ease;
         }
 
-        .dept-btn:hover { 
-            color: #fff; 
-            border-color: #4f46e5;
-            box-shadow: 0 0 15px rgba(79, 70, 229, 0.4);
-            transform: translateY(-2px);
+        .dept-btn:hover { color: #fff; border-color: #4f46e5; box-shadow: 0 0 15px rgba(79, 70, 229, 0.4); }
+        .dept-btn.active { color: #fff; background: #0a0a1a; border-color: #6366f1; box-shadow: 0 0 20px rgba(99, 102, 241, 0.6); }
+
+        /* EFFECT 1: SLIDE ANIMATIONS */
+        #dashboard-content {
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease;
+            opacity: 1; transform: translateX(0);
         }
+        .slide-out { opacity: 0 !important; transform: translateX(-30px) !important; }
+        .slide-in { animation: slideInEffect 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards; }
         
-        .dept-btn.active { 
-            color: #fff; 
-            background: #0a0a1a;
-            border-color: #6366f1;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+        @keyframes slideInEffect {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
         }
 
-        /* MAIN NEON CARDS */
-        .neon-card { 
-            background: #080808; 
-            border-radius: 16px; 
-            border: 1px solid #1a1a1a; 
-            transition: all 0.3s ease;
-        }
-        
-        /* Pulsing Border Glows */
+        .neon-card { background: #080808; border-radius: 16px; border: 1px solid #1a1a1a; }
         .glow-indigo { border-color: #4f46e5; box-shadow: 0 0 25px rgba(79, 70, 229, 0.2); }
-        .glow-emerald { border-color: #10b981; box-shadow: 0 0 20px rgba(16, 185, 129, 0.15); }
-        .glow-amber { border-color: #f59e0b; box-shadow: 0 0 20px rgba(245, 158, 11, 0.15); }
-        .glow-rose { border-color: #f43f5e; box-shadow: 0 0 20px rgba(244, 63, 94, 0.15); }
-
-        .neon-card:hover { transform: translateY(-5px); border-color: #ffffff33; }
     </style>
 </head>
 <body class="flex">
@@ -86,58 +54,44 @@
         <div class="w-64 bg-neutral-900 h-1 mb-4 overflow-hidden rounded-full">
             <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500 shadow-[0_0_15px_#6366f1]"></div>
         </div>
-        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Sanitizing 2026 Database...</p>
+        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Synchronizing Animated Core...</p>
     </div>
 
     <aside id="sidebar">
         <div class="p-6 flex justify-center border-b border-neutral-900">
-            <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.5)]">
-                <i data-lucide="shield-plus" class="text-white w-6 h-6"></i>
+            <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_#4f46e5]">
+                <i data-lucide="activity" class="text-white w-6 h-6"></i>
             </div>
         </div>
-        
         <div id="deptList">
-            <button onclick="filterDept('all', this)" class="dept-btn active">Overview</button>
-            </div>
-
-        <div class="mt-auto p-4 border-t border-neutral-900 flex justify-center">
-            <button onclick="location.reload()" class="text-neutral-600 hover:text-white transition-all">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
-            </button>
+            <button onclick="handleFilterChange('all', this)" class="dept-btn active">Overview</button>
         </div>
     </aside>
 
     <main class="flex-1 ml-[140px] overflow-y-auto h-screen p-8 bg-[#010101]">
-        
-        <header class="flex justify-between items-end mb-10">
-            <div>
-                <h1 class="text-3xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500">Intelligence</span></h1>
-                <p id="syncInfo" class="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mt-1 italic">Clean Sync: Successful</p>
-            </div>
-            <div class="text-right">
-                <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-xs tracking-widest border-b border-indigo-900/50 pb-1">GLOBAL VIEW</p>
-            </div>
-        </header>
+        <div id="dashboard-content">
+            <header class="flex justify-between items-end mb-10">
+                <div>
+                    <h1 class="text-3xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500 italic">Intelligence</span></h1>
+                    <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-xs mt-1">GLOBAL VIEW</p>
+                </div>
+            </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-            <div class="neon-card p-8 glow-indigo lg:col-span-1">
-                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Aggregate Census</p>
-                <h2 id="totalCensus" class="text-7xl font-black mt-2 tracking-tighter">0</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <div class="neon-card p-10 glow-indigo border-l-4">
+                    <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Active Census</p>
+                    <h2 id="totalCensus" class="text-8xl font-black mt-2 tracking-tighter">0</h2>
+                </div>
+                <div class="neon-card p-10 border-l-4 border-neutral-800">
+                    <p class="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Type Split</p>
+                    <div id="typeStats" class="flex flex-wrap gap-10 mt-6"></div>
+                </div>
             </div>
-            <div class="neon-card p-8 glow-emerald lg:col-span-2">
-                <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Active Classifications</p>
-                <div id="typeStats" class="flex flex-wrap gap-10 mt-6"></div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="neon-card p-6 h-[400px]"><canvas id="locChart"></canvas></div>
+                <div class="neon-card p-6 h-[400px]"><canvas id="ageChart"></canvas></div>
             </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="neon-card p-6 h-[400px] glow-amber"><canvas id="locChart"></canvas></div>
-            <div class="neon-card p-6 h-[400px] glow-rose"><canvas id="ageChart"></canvas></div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="neon-card p-6 h-[350px] glow-indigo"><canvas id="genderChart"></canvas></div>
-            <div class="neon-card p-6 h-[350px] glow-emerald"><canvas id="civilChart"></canvas></div>
         </div>
     </main>
 
@@ -146,7 +100,6 @@
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uaWV0Z3B5ZmdqYWhxam1qbHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3ODc3MzgsImV4cCI6MjA4NjM2MzczOH0.QYdZZpGSTQd4yZPnpIf8ozxC9yWL3nbGMX3do-Hb0SM';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const chartColors = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#3b82f6', '#f97316'];
         let masterData = [], charts = {};
 
         async function init() {
@@ -156,79 +109,106 @@
                 const { data, error } = await sb.from('patients').select('*').range(page * 1000, (page + 1) * 1000 - 1);
                 if (error || !data || data.length === 0) break;
                 rows = [...rows, ...data]; page++;
-                document.getElementById('progressBar').style.width = `${(rows.length / 19000) * 100}%`;
+                document.getElementById('progressBar').style.width = `${(rows.length / 18841) * 100}%`;
                 if (data.length < 1000) break;
             }
-
-            // FILTER: Auto-delete #NAME?
-            masterData = rows.filter(r => r.location !== '#NAME?' && r.department !== '#NAME?' && r.patient_type !== '#NAME?');
-
+            masterData = rows.filter(r => r.location !== '#NAME?' && r.department !== '#NAME?');
             setupSidebar();
             document.getElementById('loader').classList.add('hidden');
-            render('all');
+            render('all', false);
         }
 
         function setupSidebar() {
             const list = document.getElementById('deptList');
             const depts = [...new Set(masterData.map(d => d.department))].filter(Boolean).sort();
-            
             depts.forEach(d => {
                 const btn = document.createElement('button');
                 btn.className = 'dept-btn';
                 btn.textContent = d;
-                btn.onclick = () => filterDept(d, btn);
+                btn.onclick = () => handleFilterChange(d, btn);
                 list.appendChild(btn);
             });
         }
 
-        function filterDept(dept, el) {
+        // EFFECT 1: TRIGGER SLIDE SEQUENCE
+        async function handleFilterChange(dept, el) {
+            const content = document.getElementById('dashboard-content');
+            
+            content.classList.add('slide-out');
             document.querySelectorAll('.dept-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
-            document.getElementById('activeDeptLabel').textContent = dept.toUpperCase();
-            render(dept);
+
+            await new Promise(r => setTimeout(r, 400)); // Wait for slide out
+            
+            render(dept, true); // Update data with EFFECT 2 (Count Up)
+            
+            content.classList.remove('slide-out');
+            content.classList.add('slide-in');
+            setTimeout(() => content.classList.remove('slide-in'), 600);
         }
 
-        function render(dept) {
+        // EFFECT 2: ROLLING NUMBER LOGIC
+        function animateNumber(id, target) {
+            const el = document.getElementById(id);
+            let start = 0;
+            const duration = 800;
+            const startTime = performance.now();
+
+            function update(now) {
+                const progress = Math.min((now - startTime) / duration, 1);
+                const current = Math.floor(start + progress * (target - start));
+                el.textContent = current.toLocaleString();
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        function render(dept, animate) {
             const filtered = dept === 'all' ? masterData : masterData.filter(d => d.department === dept);
-            document.getElementById('totalCensus').textContent = filtered.length.toLocaleString();
             
+            if (animate) {
+                animateNumber('totalCensus', filtered.length);
+            } else {
+                document.getElementById('totalCensus').textContent = filtered.length.toLocaleString();
+            }
+            
+            document.getElementById('activeDeptLabel').textContent = dept.toUpperCase();
+
+            // Minimal Stats Rendering
             const types = {};
             filtered.forEach(d => { types[d.patient_type || 'Other'] = (types[d.patient_type || 'Other'] || 0) + 1; });
-            document.getElementById('typeStats').innerHTML = Object.entries(types).map(([t, c], i) => `
-                <div><span class="text-[9px] font-black text-neutral-500 uppercase tracking-tighter">${t}</span>
-                <p class="text-2xl font-black" style="color:${chartColors[i % chartColors.length]}">${c.toLocaleString()}</p></div>
+            document.getElementById('typeStats').innerHTML = Object.entries(types).map(([t, c]) => `
+                <div><span class="text-[9px] font-black text-neutral-500 uppercase">${t}</span>
+                <p class="text-2xl font-black text-white">${c.toLocaleString()}</p></div>
             `).join('');
 
+            // Basic Charts
+            updateCharts(filtered);
+        }
+
+        function updateCharts(data) {
             const getSet = (k) => {
-                const o = {}; filtered.forEach(d => { const v = d[k] || 'N/A'; o[v] = (o[v] || 0) + 1; });
+                const o = {}; data.forEach(d => { const v = d[k] || 'N/A'; o[v] = (o[v] || 0) + 1; });
                 const s = Object.entries(o).sort((a,b) => b[1]-a[1]).slice(0, 8);
                 return { l: s.map(x => x[0]), v: s.map(x => x[1]) };
             };
-
-            const l = getSet('location'), a = getSet('age_bracket'), g = getSet('gender'), civ = getSet('civil_status');
-            draw('locChart', 'bar', l.l, [{ label: 'Census', data: l.v, backgroundColor: chartColors }], 'Regional Hotspots');
-            draw('ageChart', 'bar', a.l, [{ label: 'Census', data: a.v, backgroundColor: [...chartColors].reverse() }], 'Age Demographics');
-            draw('genderChart', 'doughnut', g.l, [{ data: g.v, backgroundColor: chartColors, borderWidth: 0 }], 'Gender Split');
-            draw('civilChart', 'pie', civ.l, [{ data: civ.v, backgroundColor: chartColors, borderWidth: 0 }], 'Status Analysis');
+            const l = getSet('location'), a = getSet('age_bracket');
+            draw('locChart', 'bar', l.l, l.v, 'Hotspots', '#6366f1');
+            draw('ageChart', 'bar', a.l, a.v, 'Age Groups', '#10b981');
         }
 
-        function draw(id, type, labels, datasets, title) {
+        function draw(id, type, labels, data, title, color) {
             if (charts[id]) charts[id].destroy();
             charts[id] = new Chart(document.getElementById(id), {
-                type, data: { labels, datasets },
+                type, data: { labels, datasets: [{ data, backgroundColor: color, borderRadius: 5 }] },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { position: 'bottom', labels: { color: '#555', font: { size: 9, weight: 'bold' } } },
-                        title: { display: true, text: title.toUpperCase(), color: '#fff', font: { size: 11, weight: '900' }, padding: 15 }
-                    },
-                    scales: (type === 'bar') ? {
-                        y: { grid: { color: '#111' }, ticks: { color: '#444' } },
-                        x: { grid: { display: false }, ticks: { color: '#444', font: { size: 8 } } }
-                    } : {}
+                    plugins: { legend: { display: false }, title: { display: true, text: title, color: '#fff' } },
+                    scales: { y: { grid: { color: '#111' } }, x: { grid: { display: false } } }
                 }
             });
         }
+
         init();
     </script>
 </body>
