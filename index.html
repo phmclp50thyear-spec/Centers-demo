@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Animated Neon Analytics</title>
+    <title>Neon Command - Full Animation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -11,7 +11,6 @@
     <style>
         body { background-color: #020202; color: #e5e5e5; overflow: hidden; }
         
-        /* Sidebar Layout */
         #sidebar {
             width: 140px; border-right: 1px solid #1a1a1a; background: #050505;
             display: flex; flex-direction: column; height: 100vh; position: fixed;
@@ -54,7 +53,7 @@
         <div class="w-64 bg-neutral-900 h-1 mb-4 overflow-hidden rounded-full">
             <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500 shadow-[0_0_15px_#6366f1]"></div>
         </div>
-        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Synchronizing Animated Core...</p>
+        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Loading Data Engine...</p>
     </div>
 
     <aside id="sidebar">
@@ -83,14 +82,18 @@
                     <h2 id="totalCensus" class="text-8xl font-black mt-2 tracking-tighter">0</h2>
                 </div>
                 <div class="neon-card p-10 border-l-4 border-neutral-800">
-                    <p class="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Type Split</p>
+                    <p class="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Type Classification</p>
                     <div id="typeStats" class="flex flex-wrap gap-10 mt-6"></div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="neon-card p-6 h-[400px]"><canvas id="locChart"></canvas></div>
                 <div class="neon-card p-6 h-[400px]"><canvas id="ageChart"></canvas></div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="neon-card p-6 h-[350px]"><canvas id="genderChart"></canvas></div>
+                <div class="neon-card p-6 h-[350px]"><canvas id="civilChart"></canvas></div>
             </div>
         </div>
     </main>
@@ -99,6 +102,7 @@
         const SUPABASE_URL = 'https://onietgpyfgjahqjmjlud.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uaWV0Z3B5ZmdqYWhxam1qbHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3ODc3MzgsImV4cCI6MjA4NjM2MzczOH0.QYdZZpGSTQd4yZPnpIf8ozxC9yWL3nbGMX3do-Hb0SM';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const chartColors = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#3b82f6', '#f97316'];
 
         let masterData = [], charts = {};
 
@@ -130,30 +134,25 @@
             });
         }
 
-        // EFFECT 1: TRIGGER SLIDE SEQUENCE
         async function handleFilterChange(dept, el) {
             const content = document.getElementById('dashboard-content');
-            
             content.classList.add('slide-out');
             document.querySelectorAll('.dept-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
 
-            await new Promise(r => setTimeout(r, 400)); // Wait for slide out
-            
-            render(dept, true); // Update data with EFFECT 2 (Count Up)
+            await new Promise(r => setTimeout(r, 400));
+            render(dept, true);
             
             content.classList.remove('slide-out');
             content.classList.add('slide-in');
             setTimeout(() => content.classList.remove('slide-in'), 600);
         }
 
-        // EFFECT 2: ROLLING NUMBER LOGIC
-        function animateNumber(id, target) {
-            const el = document.getElementById(id);
+        // EFFECT 2: ROLLING NUMBER ENGINE
+        function animateNumber(el, target) {
             let start = 0;
             const duration = 800;
             const startTime = performance.now();
-
             function update(now) {
                 const progress = Math.min((now - startTime) / duration, 1);
                 const current = Math.floor(start + progress * (target - start));
@@ -166,49 +165,63 @@
         function render(dept, animate) {
             const filtered = dept === 'all' ? masterData : masterData.filter(d => d.department === dept);
             
-            if (animate) {
-                animateNumber('totalCensus', filtered.length);
-            } else {
-                document.getElementById('totalCensus').textContent = filtered.length.toLocaleString();
-            }
+            // Census Animation
+            const censusEl = document.getElementById('totalCensus');
+            if (animate) animateNumber(censusEl, filtered.length);
+            else censusEl.textContent = filtered.length.toLocaleString();
             
             document.getElementById('activeDeptLabel').textContent = dept.toUpperCase();
 
-            // Minimal Stats Rendering
+            // Type Animation
             const types = {};
             filtered.forEach(d => { types[d.patient_type || 'Other'] = (types[d.patient_type || 'Other'] || 0) + 1; });
-            document.getElementById('typeStats').innerHTML = Object.entries(types).map(([t, c]) => `
-                <div><span class="text-[9px] font-black text-neutral-500 uppercase">${t}</span>
-                <p class="text-2xl font-black text-white">${c.toLocaleString()}</p></div>
-            `).join('');
+            
+            const statsContainer = document.getElementById('typeStats');
+            statsContainer.innerHTML = ''; // Clear for animation
+            Object.entries(types).forEach(([t, c], i) => {
+                const div = document.createElement('div');
+                div.innerHTML = `<span class="text-[9px] font-black text-neutral-500 uppercase">${t}</span>
+                                 <p id="type-count-${i}" class="text-2xl font-black" style="color:${chartColors[i % chartColors.length]}">0</p>`;
+                statsContainer.appendChild(div);
+                if (animate) animateNumber(document.getElementById(`type-count-${i}`), c);
+                else document.getElementById(`type-count-${i}`).textContent = c.toLocaleString();
+            });
 
-            // Basic Charts
-            updateCharts(filtered);
+            updateCharts(filtered, animate);
         }
 
-        function updateCharts(data) {
+        function updateCharts(data, animate) {
             const getSet = (k) => {
                 const o = {}; data.forEach(d => { const v = d[k] || 'N/A'; o[v] = (o[v] || 0) + 1; });
                 const s = Object.entries(o).sort((a,b) => b[1]-a[1]).slice(0, 8);
                 return { l: s.map(x => x[0]), v: s.map(x => x[1]) };
             };
-            const l = getSet('location'), a = getSet('age_bracket');
-            draw('locChart', 'bar', l.l, l.v, 'Hotspots', '#6366f1');
-            draw('ageChart', 'bar', a.l, a.v, 'Age Groups', '#10b981');
+            const l = getSet('location'), a = getSet('age_bracket'), g = getSet('gender'), c = getSet('civil_status');
+            
+            draw('locChart', 'bar', l.l, l.v, 'Locations', chartColors, animate);
+            draw('ageChart', 'bar', a.l, a.v, 'Age Range', [...chartColors].reverse(), animate);
+            draw('genderChart', 'doughnut', g.l, g.v, 'Gender', chartColors, animate);
+            draw('civilChart', 'pie', c.l, c.v, 'Civil Status', chartColors, animate);
         }
 
-        function draw(id, type, labels, data, title, color) {
+        function draw(id, type, labels, data, title, colors, animate) {
             if (charts[id]) charts[id].destroy();
             charts[id] = new Chart(document.getElementById(id), {
-                type, data: { labels, datasets: [{ data, backgroundColor: color, borderRadius: 5 }] },
+                type, data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: type === 'bar' ? 5 : 0, borderWidth: 0 }] },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false }, title: { display: true, text: title, color: '#fff' } },
-                    scales: { y: { grid: { color: '#111' } }, x: { grid: { display: false } } }
+                    animation: { duration: animate ? 1000 : 0, easing: 'easeOutQuart' },
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { color: '#555', font: { size: 9, weight: 'bold' } } },
+                        title: { display: true, text: title.toUpperCase(), color: '#fff', font: { size: 10, weight: '900' }, padding: 15 }
+                    },
+                    scales: (type === 'bar') ? {
+                        y: { grid: { color: '#111' }, ticks: { color: '#444' } },
+                        x: { grid: { display: false }, ticks: { color: '#444', font: { size: 8 } } }
+                    } : {}
                 }
             });
         }
-
         init();
     </script>
 </body>
