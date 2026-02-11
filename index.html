@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics - Sidebar Command</title>
+    <title>Neon Analytics - Sidebar Pop-up</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -11,17 +11,16 @@
     <style>
         body { background-color: #020202; color: #e5e5e5; overflow: hidden; }
         
+        /* SIDEBAR STRUCTURE */
         #sidebar {
-            width: 75px;
+            width: 70px;
             border-right: 1px solid #1a1a1a;
             background: #050505;
             display: flex;
             flex-direction: column;
             height: 100vh;
             position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 100;
+            left: 0; top: 0; z-index: 100;
         }
 
         #deptList {
@@ -31,54 +30,52 @@
         }
         #deptList::-webkit-scrollbar { display: none; }
 
+        /* NEON SIDEBAR BUTTONS */
         .dept-btn {
-            position: relative;
+            position: relative; /* Crucial for absolute label positioning */
             display: flex;
             align-items: center;
             justify-content: center;
             width: 100%;
-            height: 65px;
+            height: 60px;
             color: #444;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
             flex-shrink: 0;
         }
 
-        /* Hover & Active Glowing Effects */
         .dept-btn:hover { 
             color: #fff; 
             background: #0f0f0f;
-            box-shadow: inset 0 0 15px rgba(99, 102, 241, 0.1);
+            box-shadow: inset 0 0 15px rgba(99, 102, 241, 0.2);
         }
         
         .dept-btn.active { 
             color: #6366f1; 
             background: #0a0a1a; 
-            box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.2);
             border-right: 4px solid #6366f1;
-            filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5));
+            filter: drop-shadow(0 0 10px rgba(99, 102, 241, 0.6));
         }
 
-        /* Fixed Pop-up Label Fix */
+        /* SIDEWAY POP-UP LABEL */
         .dept-label {
             position: absolute;
-            left: 80px;
-            background: rgba(99, 102, 241, 0.98);
-            backdrop-filter: blur(12px);
+            left: 75px; /* Appears just to the right of the sidebar */
+            background: #6366f1;
             color: white;
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 6px 14px;
+            border-radius: 6px;
             font-size: 10px;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
+            letter-spacing: 1px;
             white-space: nowrap;
             opacity: 0;
             visibility: hidden;
-            transform: translateX(-15px);
-            transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateX(-10px);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
             z-index: 200;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.6), 0 0 15px rgba(99, 102, 241, 0.4);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
         }
 
         .dept-btn:hover .dept-label {
@@ -87,8 +84,17 @@
             transform: translateX(5px);
         }
 
-        .neon-card { background: #080808; border-radius: 20px; border: 1px solid #1a1a1a; transition: all 0.3s; }
-        .glow-indigo { border-color: #4f46e5; box-shadow: 0 0 25px rgba(79, 70, 229, 0.15); }
+        /* NEON CARDS */
+        .neon-card { 
+            background: #080808; 
+            border-radius: 20px; 
+            border: 1px solid #1a1a1a; 
+            transition: transform 0.3s ease;
+        }
+        .glow-indigo { border-color: #4f46e5; box-shadow: 0 0 25px rgba(79, 70, 229, 0.2); }
+        .glow-multi { border-color: #222; }
+        .glow-multi:hover { border-color: #333; box-shadow: 0 0 20px rgba(255, 255, 255, 0.05); }
+
     </style>
 </head>
 <body class="flex">
@@ -97,64 +103,62 @@
         <div class="w-64 bg-neutral-900 h-1 mb-4 overflow-hidden rounded-full">
             <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500 shadow-[0_0_15px_#6366f1]"></div>
         </div>
-        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase italic">Initializing Medical Systems...</p>
+        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase italic">Filtering Patient Data...</p>
     </div>
 
     <aside id="sidebar">
-        <div class="h-[75px] flex items-center justify-center border-b border-neutral-900">
-            <div class="h-10 w-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-[0_0_20px_rgba(79,70,229,0.5)]">
-                <i data-lucide="cross" class="text-white w-6 h-6"></i>
+        <div class="h-[70px] flex items-center justify-center border-b border-neutral-900 flex-shrink-0">
+            <div class="h-9 w-9 bg-indigo-600 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(79,70,229,0.5)]">
+                <i data-lucide="activity" class="text-white w-5 h-5"></i>
             </div>
         </div>
         
         <div id="deptList">
             <button onclick="filterDept('all', this)" class="dept-btn active">
-                <i data-lucide="layout-dashboard"></i>
-                <span class="dept-label">Full Dashboard</span>
+                <i data-lucide="layout-grid"></i>
+                <span class="dept-label">Full Overview</span>
             </button>
-        </div>
+            </div>
 
-        <div class="mt-auto border-t border-neutral-900 p-6 flex flex-col items-center gap-6">
-            <button onclick="location.reload()" class="text-neutral-600 hover:text-indigo-400 transition-all">
+        <div class="mt-auto border-t border-neutral-900 p-6 flex justify-center flex-shrink-0">
+            <button onclick="location.reload()" class="text-neutral-700 hover:text-white transition-colors">
                 <i data-lucide="refresh-cw" class="w-5 h-5"></i>
             </button>
         </div>
     </aside>
 
-    <main class="flex-1 ml-[75px] overflow-y-auto h-screen p-10 bg-[#010101]">
-        <header class="flex justify-between items-center mb-12">
+    <main class="flex-1 ml-[70px] overflow-y-auto h-screen p-8 bg-[#010101]">
+        
+        <header class="flex justify-between items-end mb-10">
             <div>
-                <h1 class="text-4xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500">Analytics</span></h1>
-                <div class="flex items-center gap-2 mt-2">
-                    <span class="h-1.5 w-1.5 bg-emerald-500 rounded-full animate-ping"></span>
-                    <p id="syncInfo" class="text-[9px] text-neutral-500 font-bold uppercase tracking-widest">Real-time Data Active</p>
-                </div>
+                <h1 class="text-3xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500 italic">Command</span></h1>
+                <p id="syncInfo" class="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mt-1">Live Feed: 18,841 Records</p>
             </div>
-            <div class="bg-neutral-900/50 px-6 py-3 rounded-2xl border border-neutral-800">
-                <p class="text-[9px] text-neutral-500 font-black uppercase tracking-widest">Focus Department</p>
-                <p id="activeDeptLabel" class="text-white font-black uppercase text-lg">ALL DEPARTMENTS</p>
+            <div class="text-right">
+                <p class="text-[9px] text-neutral-600 font-black uppercase tracking-[0.2em]">Active Filter</p>
+                <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-sm">GLOBAL ANALYSIS</p>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-            <div class="neon-card p-10 glow-indigo border-l-8">
-                <p class="text-[11px] font-black text-indigo-400 uppercase tracking-widest">Total Patient Census</p>
-                <h2 id="totalCensus" class="text-8xl font-black mt-2 tracking-tighter text-white">0</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="neon-card p-8 glow-indigo border-l-4">
+                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Total Patient Census</p>
+                <h2 id="totalCensus" class="text-7xl font-black mt-2 tracking-tighter">0</h2>
             </div>
-            <div class="neon-card p-10 border-l-8 border-neutral-800">
-                <p class="text-[11px] font-black text-neutral-500 uppercase tracking-widest">Type Classification</p>
-                <div id="typeStats" class="flex flex-wrap gap-10 mt-6"></div>
+            <div class="neon-card p-8 border-l-4 border-neutral-800 glow-multi">
+                <p class="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Type Distribution</p>
+                <div id="typeStats" class="flex flex-wrap gap-8 mt-4"></div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <div class="neon-card p-8 h-[450px]"><canvas id="locChart"></canvas></div>
-            <div class="neon-card p-8 h-[450px]"><canvas id="ageChart"></canvas></div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="neon-card p-6 h-[420px] glow-multi"><canvas id="locChart"></canvas></div>
+            <div class="neon-card p-6 h-[420px] glow-multi"><canvas id="ageChart"></canvas></div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div class="neon-card p-8 h-[380px]"><canvas id="genderChart"></canvas></div>
-            <div class="neon-card p-8 h-[380px]"><canvas id="civilChart"></canvas></div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="neon-card p-6 h-[350px] glow-multi"><canvas id="genderChart"></canvas></div>
+            <div class="neon-card p-6 h-[350px] glow-multi"><canvas id="civilChart"></canvas></div>
         </div>
     </main>
 
@@ -165,12 +169,12 @@
 
         const chartColors = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#3b82f6', '#f97316'];
         
-        // Icon mapping for different departments
+        // Icon mapping
         const iconMap = {
             'cardiology': 'heart', 'emergency': 'zap', 'pediatrics': 'baby',
             'orthopedics': 'bone', 'radiology': 'scan', 'neurology': 'brain',
-            'surgery': 'scissors', 'maternity': 'armchair', 'dental': 'smile',
-            'laboratory': 'beaker', 'pharmacy': 'pill', 'default': 'box'
+            'surgery': 'scissors', 'dental': 'smile', 'laboratory': 'beaker',
+            'pharmacy': 'pill', 'default': 'box'
         };
 
         let masterData = [], charts = {};
@@ -182,11 +186,13 @@
                 const { data, error } = await sb.from('patients').select('*').range(page * 1000, (page + 1) * 1000 - 1);
                 if (error || !data || data.length === 0) break;
                 rows = [...rows, ...data]; page++;
-                document.getElementById('progressBar').style.width = `${(rows.length / 19000) * 100}%`;
+                document.getElementById('progressBar').style.width = `${(rows.length / 18841) * 100}%`;
                 if (data.length < 1000) break;
             }
 
+            // AUTO-DELETE #NAME?
             masterData = rows.filter(r => r.location !== '#NAME?' && r.department !== '#NAME?' && r.patient_type !== '#NAME?');
+
             setupSidebar();
             document.getElementById('loader').classList.add('hidden');
             render('all');
@@ -198,10 +204,8 @@
             
             depts.forEach(d => {
                 const btn = document.createElement('button');
-                btn.className = 'dept-btn group';
+                btn.className = 'dept-btn';
                 btn.onclick = () => filterDept(d, btn);
-                
-                // Choose icon based on department name match
                 const iconName = iconMap[d.toLowerCase()] || iconMap['default'];
                 btn.innerHTML = `<i data-lucide="${iconName}"></i><span class="dept-label">${d}</span>`;
                 list.appendChild(btn);
@@ -212,7 +216,7 @@
         function filterDept(dept, el) {
             document.querySelectorAll('.dept-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
-            document.getElementById('activeDeptLabel').textContent = dept === 'all' ? 'ALL DEPARTMENTS' : dept.toUpperCase();
+            document.getElementById('activeDeptLabel').textContent = dept.toUpperCase();
             render(dept);
         }
 
@@ -223,8 +227,8 @@
             const types = {};
             filtered.forEach(d => { types[d.patient_type || 'Other'] = (types[d.patient_type || 'Other'] || 0) + 1; });
             document.getElementById('typeStats').innerHTML = Object.entries(types).map(([t, c], i) => `
-                <div><span class="text-[10px] font-black text-neutral-500 uppercase tracking-widest">${t}</span>
-                <p class="text-3xl font-black" style="color:${chartColors[i % chartColors.length]}">${c.toLocaleString()}</p></div>
+                <div><span class="text-[9px] font-black text-neutral-500 uppercase">${t}</span>
+                <p class="text-2xl font-black" style="color:${chartColors[i % chartColors.length]}">${c.toLocaleString()}</p></div>
             `).join('');
 
             const getSet = (k) => {
@@ -234,10 +238,10 @@
             };
 
             const l = getSet('location'), a = getSet('age_bracket'), g = getSet('gender'), civ = getSet('civil_status');
-            draw('locChart', 'bar', l.l, [{ label: 'Census', data: l.v, backgroundColor: chartColors, borderRadius: 10 }], 'Center Distribution');
-            draw('ageChart', 'bar', a.l, [{ label: 'Census', data: a.v, backgroundColor: [...chartColors].reverse(), borderRadius: 10 }], 'Age Bracket Analytics');
-            draw('genderChart', 'doughnut', g.l, [{ data: g.v, backgroundColor: chartColors, borderWidth: 0, hoverOffset: 20 }], 'Gender Split');
-            draw('civilChart', 'pie', civ.l, [{ data: civ.v, backgroundColor: chartColors, borderWidth: 0, hoverOffset: 20 }], 'Civil Status Analysis');
+            draw('locChart', 'bar', l.l, [{ label: 'Census', data: l.v, backgroundColor: chartColors }], 'Locations');
+            draw('ageChart', 'bar', a.l, [{ label: 'Census', data: a.v, backgroundColor: [...chartColors].reverse() }], 'Age Range');
+            draw('genderChart', 'doughnut', g.l, [{ data: g.v, backgroundColor: chartColors, borderWidth: 0 }], 'Gender');
+            draw('civilChart', 'pie', civ.l, [{ data: civ.v, backgroundColor: chartColors, borderWidth: 0 }], 'Civil Status');
         }
 
         function draw(id, type, labels, datasets, title) {
@@ -247,12 +251,12 @@
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     plugins: { 
-                        legend: { position: 'right', labels: { color: '#888', font: { size: 10, weight: 'bold' }, usePointStyle: true, padding: 20 } },
-                        title: { display: true, text: title.toUpperCase(), color: '#fff', font: { size: 12, weight: '900' }, padding: 25, align: 'start' }
+                        legend: { position: 'bottom', labels: { color: '#555', font: { size: 9, weight: 'bold' } } },
+                        title: { display: true, text: title.toUpperCase(), color: '#fff', font: { size: 10, weight: '900' }, padding: 15 }
                     },
                     scales: (type === 'bar') ? {
                         y: { grid: { color: '#111' }, ticks: { color: '#444' } },
-                        x: { grid: { display: false }, ticks: { color: '#444', font: { size: 10 } } }
+                        x: { grid: { display: false }, ticks: { color: '#444' } }
                     } : {}
                 }
             });
