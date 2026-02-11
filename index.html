@@ -3,63 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CI v2 - Full Screen Command</title>
+    <title>CI v2 - Restored Glow Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background-color: #020202; color: #e5e5e5; overflow: hidden; height: 100vh; margin: 0; }
-        
-        /* Vignette Effect */
-        body::after {
-            content: ""; position: fixed; inset: 0; pointer-events: none;
-            background: radial-gradient(circle, transparent 60%, rgba(0,0,0,0.8) 100%);
-            z-index: 40;
-        }
 
-        /* AUTO-HIDE SIDEBAR LOGIC */
+        /* AUTO-HIDE SIDEBAR */
         #sidebar {
-            width: 160px; border-right: 1px solid #111; background: rgba(5, 5, 5, 0.95);
+            width: 160px; border-right: 1px solid #1a1a1a; background: rgba(5, 5, 5, 0.98);
             display: flex; flex-direction: column; height: 100vh; position: fixed;
-            left: -150px; /* Hidden state */
-            top: 0; z-index: 100;
+            left: -155px; top: 0; z-index: 100;
             transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            backdrop-blur: 10px;
         }
-        #sidebar:hover { left: 0; }
+        #sidebar:hover { left: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.5); }
         
-        /* Sidebar Indicator (Visual Cue) */
         #sidebar::after {
             content: ""; position: absolute; right: 0; top: 0; bottom: 0;
-            width: 4px; background: linear-gradient(to right, transparent, rgba(99, 102, 241, 0.3));
+            width: 5px; background: #4f46e5; opacity: 0.3;
         }
 
         .dept-btn {
             width: 100%; padding: 10px 8px; margin-bottom: 4px; background: #080808;
             border: 1px solid #151515; border-radius: 4px; color: #555;
             font-size: 8px; font-weight: 800; text-transform: uppercase;
-            text-align: center; letter-spacing: 0.5px; transition: all 0.2s;
+            text-align: center; transition: all 0.2s;
         }
         .dept-btn:hover { color: #fff; border-color: #4f46e5; }
         .dept-btn.active { color: #fff; background: #0a0a1a; border-color: #6366f1; box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
 
-        /* ANIMATIONS */
-        #dashboard-content { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease; padding: 24px; }
+        /* ANIMATIONS & GLOWS */
+        #dashboard-content { transition: transform 0.4s ease, opacity 0.4s ease; padding: 20px; height: 100vh; display: flex; flex-direction: column; }
         .slide-out { opacity: 0 !important; transform: translateX(-20px) !important; }
         .slide-in { animation: slideInEffect 0.5s ease-out forwards; }
         @keyframes slideInEffect { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
 
         .pulse-text { animation: neonPulse 2s infinite ease-in-out; }
         @keyframes neonPulse {
-            0%, 100% { text-shadow: 0 0 8px rgba(99,102,241,0.3); opacity: 0.8; }
-            50% { text-shadow: 0 0 20px rgba(99,102,241,0.8); opacity: 1; }
+            0%, 100% { text-shadow: 0 0 5px rgba(99,102,241,0.2); opacity: 0.7; }
+            50% { text-shadow: 0 0 15px rgba(99,102,241,1), 0 0 30px rgba(99,102,241,0.5); opacity: 1; }
         }
 
-        .neon-card { background: #070707; border-radius: 12px; border: 1px solid #151515; overflow: hidden; height: 100%; }
-        .glow-indigo { border-color: #4f46e533; box-shadow: 0 0 20px rgba(79, 70, 229, 0.1); }
+        .neon-card { background: #070707; border-radius: 12px; border: 1px solid #1a1a1a; position: relative; }
+        .glow-indigo { border-color: #4f46e5; box-shadow: 0 0 20px rgba(79, 70, 229, 0.15); }
+        .glow-border { border-color: #1a1a1a; transition: border-color 0.3s; }
+        .glow-border:hover { border-color: #333; box-shadow: 0 0 15px rgba(255,255,255,0.03); }
         
-        .chart-box { height: 100%; width: 100%; padding: 10px; }
+        .chart-box { height: 100%; width: 100%; padding: 8px; }
         .scrollbar-hide::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -69,49 +61,41 @@
         <div class="w-48 bg-neutral-900 h-0.5 mb-4 rounded-full overflow-hidden">
             <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500"></div>
         </div>
-        <p class="text-[8px] font-black tracking-widest text-indigo-400 uppercase">Deploying Fullscreen Interface...</p>
+        <p class="text-[8px] font-black tracking-widest text-indigo-400 uppercase">Restoring Glow Protocols...</p>
     </div>
 
     <aside id="sidebar">
-        <div class="p-6 flex justify-center border-b border-neutral-900">
-            <i data-lucide="menu" class="text-indigo-500 w-5 h-5"></i>
-        </div>
+        <div class="p-6 flex justify-center border-b border-neutral-900"><i data-lucide="layout-grid" class="text-indigo-500 w-5 h-5"></i></div>
         <div id="deptList" class="flex-grow overflow-y-auto p-3 scrollbar-hide">
             <button onclick="handleFilterChange('all', this)" class="dept-btn active">Global View</button>
         </div>
-        <div class="p-4 border-t border-neutral-900 text-[7px] text-neutral-700 font-bold text-center uppercase tracking-widest">
-            CI System v2.0
-        </div>
     </aside>
 
-    <main class="flex-1 h-screen flex flex-col relative z-10">
-        <div id="dashboard-content" class="flex-1 flex flex-col space-y-4">
+    <main class="flex-1 h-screen overflow-hidden">
+        <div id="dashboard-content">
             
-            <header class="flex justify-between items-center h-10">
-                <div class="flex items-center gap-3">
-                    <div class="h-4 w-1 bg-indigo-500 rounded-full"></div>
-                    <h1 class="text-lg font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500">Intelligence</span></h1>
-                </div>
+            <header class="flex justify-between items-center h-10 mb-4">
+                <h1 class="text-xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500">Intelligence</span></h1>
                 <div class="text-right">
-                    <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-sm pulse-text">GLOBAL OVERVIEW</p>
+                    <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-lg pulse-text">GLOBAL OVERVIEW</p>
                 </div>
             </header>
 
-            <div class="grid grid-cols-5 gap-4 h-28">
-                <div class="neon-card col-span-1 p-5 glow-indigo flex flex-col justify-center">
-                    <p class="text-[7px] font-black text-indigo-400 uppercase tracking-widest">Census</p>
-                    <h2 id="totalCensus" class="text-5xl font-black tracking-tighter">0</h2>
+            <div class="grid grid-cols-5 gap-4 h-24 mb-4">
+                <div class="neon-card col-span-1 p-4 glow-indigo border-l-4 border-l-indigo-500 flex flex-col justify-center">
+                    <p class="text-[8px] font-black text-indigo-400 uppercase tracking-widest">Census</p>
+                    <h2 id="totalCensus" class="text-4xl font-black tracking-tighter">0</h2>
                 </div>
-                <div class="neon-card col-span-4 p-5 flex items-center">
-                    <div id="typeStats" class="flex gap-12"></div>
+                <div class="neon-card col-span-4 p-4 glow-border flex items-center">
+                    <div id="typeStats" class="flex gap-10"></div>
                 </div>
             </div>
 
-            <div class="flex-1 grid grid-cols-2 gap-4 pb-2">
-                <div class="neon-card"><div class="chart-box"><canvas id="locChart"></canvas></div></div>
-                <div class="neon-card"><div class="chart-box"><canvas id="ageChart"></canvas></div></div>
-                <div class="neon-card"><div class="chart-box"><canvas id="genderChart"></canvas></div></div>
-                <div class="neon-card"><div class="chart-box"><canvas id="civilChart"></canvas></div></div>
+            <div class="flex-1 grid grid-cols-2 gap-4 min-h-0">
+                <div class="neon-card glow-border"><div class="chart-box"><canvas id="locChart"></canvas></div></div>
+                <div class="neon-card glow-border"><div class="chart-box"><canvas id="ageChart"></canvas></div></div>
+                <div class="neon-card glow-border"><div class="chart-box"><canvas id="genderChart"></canvas></div></div>
+                <div class="neon-card glow-border"><div class="chart-box"><canvas id="civilChart"></canvas></div></div>
             </div>
         </div>
     </main>
@@ -217,12 +201,12 @@
                     responsive: true, maintainAspectRatio: false,
                     animation: { duration: animate ? 800 : 0 },
                     plugins: { 
-                        legend: { position: 'right', labels: { color: '#444', font: { size: 7 }, boxWidth: 10, padding: 10 } },
-                        title: { display: true, text: title.toUpperCase(), color: '#888', font: { size: 9, weight: '900' }, padding: { bottom: 10 } }
+                        legend: { position: 'right', labels: { color: '#666', font: { size: 7 }, boxWidth: 10 } },
+                        title: { display: true, text: title.toUpperCase(), color: '#aaa', font: { size: 9, weight: '900' } }
                     },
                     scales: type === 'bar' ? {
-                        y: { ticks: { color: '#333', font: { size: 7 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
-                        x: { ticks: { color: '#333', font: { size: 7 } }, grid: { display: false } }
+                        y: { ticks: { color: '#444', font: { size: 7 } }, grid: { color: 'rgba(255,255,255,0.03)' } },
+                        x: { ticks: { color: '#444', font: { size: 7 } }, grid: { display: false } }
                     } : {}
                 }
             });
