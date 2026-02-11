@@ -3,77 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Center Demographics - 2026</title>
+    <title>Center Demographics - Full Sync</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background-color: #050505; color: #e5e5e5; }
-        .glass-card { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 16px; transition: all 0.3s ease; }
-        .glow-indigo { border: 1px solid rgba(99, 102, 241, 0.2); }
-        select { background: #111 !important; color: white !important; border: 1px solid #222 !important; cursor: pointer; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+        .glass-card { background: #0f0f0f; border: 1px solid #1a1a1a; border-radius: 16px; }
+        .glow-indigo { border: 1px solid rgba(99, 102, 241, 0.2); box-shadow: 0 0 20px rgba(99, 102, 241, 0.05); }
+        select { background: #111 !important; color: white !important; border: 1px solid #222 !important; }
     </style>
 </head>
 <body class="font-sans antialiased">
 
     <div id="loader" class="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center">
-        <div class="w-48 bg-neutral-900 h-1 mb-4 overflow-hidden rounded-full">
-            <div id="progressBar" class="bg-indigo-600 h-full w-0 transition-all duration-300"></div>
+        <div class="w-64 bg-neutral-900 h-1.5 mb-4 overflow-hidden rounded-full">
+            <div id="progressBar" class="bg-indigo-600 h-full w-0 transition-all duration-300 shadow-[0_0_15px_#6366f1]"></div>
         </div>
-        <p class="text-[10px] font-bold tracking-[0.3em] text-neutral-500 uppercase">Fetching Center Demographics</p>
+        <div class="text-center">
+            <p class="text-[10px] font-bold tracking-[0.3em] text-neutral-500 uppercase">Synchronizing Records</p>
+            <p id="loadCount" class="text-[9px] text-indigo-400 mt-2 font-mono">0 / 18,841</p>
+        </div>
     </div>
 
-    <nav class="border-b border-neutral-900 bg-black/80 backdrop-blur-md px-8 py-4 flex flex-wrap justify-between items-center sticky top-0 z-50">
-        <div class="flex items-center gap-8">
-            <div class="flex items-center gap-3">
-                <div class="h-6 w-1 bg-indigo-500 rounded-full shadow-[0_0_10px_#6366f1]"></div>
-                <h1 class="text-sm font-black uppercase tracking-widest text-white">Analytics Engine</h1>
-            </div>
+    <nav class="border-b border-neutral-900 bg-black/80 backdrop-blur-md px-8 py-4 flex justify-between items-center sticky top-0 z-50">
+        <div class="flex items-center gap-3">
+            <div class="h-6 w-1 bg-indigo-500 rounded-full"></div>
+            <h1 class="text-sm font-black uppercase tracking-widest text-white">Center Demographics</h1>
         </div>
         <div class="flex gap-2">
             <select id="deptSlicer" class="rounded-lg px-4 py-2 text-xs font-bold outline-none">
                 <option value="all">All Departments</option>
             </select>
-            <button onclick="resetFilters()" class="bg-neutral-900 hover:bg-neutral-800 text-white px-3 py-2 rounded-lg transition-all border border-neutral-800">
+            <button onclick="resetFilters()" class="bg-neutral-900 hover:bg-neutral-800 text-white px-3 py-2 rounded-lg border border-neutral-800">
                 <i data-lucide="refresh-cw" class="w-4 h-4"></i>
             </button>
         </div>
     </nav>
 
     <main class="p-6 max-w-[1600px] mx-auto space-y-6">
-        
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="glass-card p-8 glow-indigo border-l-4 border-indigo-600">
-                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-[0.2em]">Total Patient Census</p>
+                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Total Patient Census</p>
                 <h2 id="totalCensus" class="text-6xl font-black mt-2">0</h2>
-                <p class="text-neutral-600 text-[10px] mt-2 uppercase font-bold italic">Live database count</p>
             </div>
-            <div class="glass-card p-8 border-l-4 border-neutral-700">
-                <p class="text-[10px] font-black text-neutral-500 uppercase tracking-[0.2em]">Patient Type Distribution</p>
-                <div id="typeStats" class="flex flex-wrap gap-8 mt-4">
-                    </div>
+            <div class="glass-card p-8 border-l-4 border-emerald-500">
+                <p class="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Patient Type Count</p>
+                <div id="typeStats" class="flex flex-wrap gap-8 mt-4"></div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="glass-card p-6 h-[400px]">
-                <canvas id="locChart"></canvas>
-            </div>
-            <div class="glass-card p-6 h-[400px]">
-                <canvas id="ageChart"></canvas>
-            </div>
+            <div class="glass-card p-6 h-[400px]"><canvas id="locChart"></canvas></div>
+            <div class="glass-card p-6 h-[400px]"><canvas id="ageChart"></canvas></div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="glass-card p-6 h-[350px]">
-                <canvas id="genderChart"></canvas>
-            </div>
-            <div class="glass-card p-6 h-[350px]">
-                <canvas id="civilChart"></canvas>
-            </div>
+            <div class="glass-card p-6 h-[350px]"><canvas id="genderChart"></canvas></div>
+            <div class="glass-card p-6 h-[350px]"><canvas id="civilChart"></canvas></div>
         </div>
     </main>
 
@@ -83,96 +71,101 @@
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let masterData = [], charts = {};
+        const TOTAL_EXPECTED = 18841;
 
         async function init() {
             lucide.createIcons();
-            
-            // Initial fetch - assuming 'patients' is the table name
-            const { data, error } = await sb.from('patients').select('*');
-            
-            if (error) {
-                console.error("Supabase Connection Error:", error);
-                document.getElementById('loader').innerHTML = `<p class="text-rose-500 font-bold">Error: Connection Refused. Check RLS.</p>`;
-                return;
-            }
+            let rows = [], page = 0;
+            const pageSize = 1000;
 
-            masterData = data;
-            
-            // Dynamic Slicer for Department
+            try {
+                while (true) {
+                    const { data, error } = await sb
+                        .from('patients')
+                        .select('*')
+                        .range(page * pageSize, (page + 1) * pageSize - 1);
+
+                    if (error) throw error;
+                    if (!data || data.length === 0) break;
+
+                    rows = [...rows, ...data];
+                    page++;
+
+                    // Update UI Progress
+                    const progress = Math.min((rows.length / TOTAL_EXPECTED) * 100, 100);
+                    document.getElementById('progressBar').style.width = `${progress}%`;
+                    document.getElementById('loadCount').textContent = `${rows.length.toLocaleString()} / ${TOTAL_EXPECTED.toLocaleString()}`;
+
+                    if (data.length < pageSize) break; // Finished
+                }
+
+                masterData = rows;
+                setupSlicers();
+                document.getElementById('loader').classList.add('hidden');
+                render();
+
+            } catch (err) {
+                console.error("Data Load Error:", err);
+                document.getElementById('loader').innerHTML = `<p class="text-rose-500">Sync Failed. Check Console.</p>`;
+            }
+        }
+
+        function setupSlicers() {
             const deptEl = document.getElementById('deptSlicer');
-            const depts = [...new Set(data.map(d => d.department))].filter(Boolean).sort();
+            const depts = [...new Set(masterData.map(d => d.department))].filter(Boolean).sort();
             depts.forEach(d => {
                 const opt = document.createElement('option');
-                opt.value = d;
-                opt.textContent = d;
+                opt.value = d; opt.textContent = d;
                 deptEl.appendChild(opt);
             });
-
-            document.getElementById('loader').classList.add('hidden');
             deptEl.addEventListener('change', render);
-            render();
         }
 
         function render() {
             const dVal = document.getElementById('deptSlicer').value;
             const filtered = dVal === 'all' ? masterData : masterData.filter(d => d.department === dVal);
 
-            updateMetrics(filtered);
-            updateCharts(filtered);
-        }
-
-        function updateMetrics(data) {
-            document.getElementById('totalCensus').textContent = data.length.toLocaleString();
-
-            const types = {};
-            data.forEach(d => { 
-                const t = d.patient_type || 'Unknown';
-                types[t] = (types[t] || 0) + 1; 
-            });
+            // 1. Update Metrics
+            document.getElementById('totalCensus').textContent = filtered.length.toLocaleString();
             
-            const typeContainer = document.getElementById('typeStats');
-            typeContainer.innerHTML = Object.entries(types).map(([type, count]) => `
+            const types = {};
+            filtered.forEach(d => { types[d.patient_type || 'N/A'] = (types[d.patient_type || 'N/A'] || 0) + 1; });
+            document.getElementById('typeStats').innerHTML = Object.entries(types).map(([t, c]) => `
                 <div>
-                    <span class="text-[9px] font-black text-neutral-500 uppercase tracking-widest">${type}</span>
-                    <p class="text-2xl font-black text-white">${count}</p>
+                    <span class="text-[9px] font-black text-neutral-500 uppercase tracking-widest">${t}</span>
+                    <p class="text-2xl font-black text-white">${c.toLocaleString()}</p>
                 </div>
             `).join('');
-        }
 
-        function updateCharts(data) {
-            const grp = (key) => {
+            // 2. Update Charts
+            const process = (key) => {
                 const counts = {};
-                data.forEach(d => { const v = d[key] || 'N/A'; counts[v] = (counts[v] || 0) + 1; });
-                const sorted = Object.entries(counts).sort((a,b) => b[1] - a[1]).slice(0, 8);
-                return { labels: sorted.map(x => x[0]), values: sorted.map(x => x[1]) };
+                filtered.forEach(d => { const v = d[key] || 'Not Set'; counts[v] = (counts[v] || 0) + 1; });
+                const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]).slice(0, 10);
+                return { l: sorted.map(x => x[0]), v: sorted.map(x => x[1]) };
             };
 
-            const l = grp('location');
-            const a = grp('age_bracket');
-            const g = grp('gender');
-            const c = grp('civil_status');
+            const loc = process('location'), age = process('age_bracket'), gen = process('gender'), civ = process('civil_status');
 
-            draw('locChart', 'bar', l.labels, [{ label: 'Patients', data: l.values, backgroundColor: '#6366f1', borderRadius: 4 }], 'Patients by Location');
-            draw('ageChart', 'bar', a.labels, [{ label: 'Patients', data: a.values, backgroundColor: '#4f46e5', borderRadius: 4 }], 'Age Bracket Analysis');
-            draw('genderChart', 'doughnut', g.labels, [{ data: g.values, backgroundColor: ['#6366f1', '#4338ca', '#312e81', '#1e1b4b'], borderWidth: 0 }], 'Gender Split');
-            draw('civilChart', 'pie', c.labels, [{ data: c.values, backgroundColor: ['#818cf8', '#6366f1', '#4f46e5', '#3730a3'], borderWidth: 0 }], 'Civil Status');
+            draw('locChart', 'bar', loc.l, [{ label: 'Patients', data: loc.v, backgroundColor: '#6366f1' }], 'Center Distribution');
+            draw('ageChart', 'bar', age.l, [{ label: 'Patients', data: age.v, backgroundColor: '#4f46e5' }], 'Age Brackets');
+            draw('genderChart', 'doughnut', gen.l, [{ data: gen.v, backgroundColor: ['#6366f1', '#4338ca', '#312e81', '#1e1b4b'], borderWidth: 0 }], 'Gender Split');
+            draw('civilChart', 'pie', civ.l, [{ data: civ.v, backgroundColor: ['#818cf8', '#6366f1', '#4f46e5', '#3730a3'], borderWidth: 0 }], 'Civil Status');
         }
 
         function draw(id, type, labels, datasets, title) {
             if (charts[id]) charts[id].destroy();
             charts[id] = new Chart(document.getElementById(id), {
-                type,
-                data: { labels, datasets },
+                type, data: { labels, datasets },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: '#555', font: { size: 9, weight: 'bold' }, boxWidth: 10 } },
-                        title: { display: true, text: title.toUpperCase(), color: '#999', font: { size: 10, weight: '900' }, padding: 20 }
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { 
+                        legend: { position: 'bottom', labels: { color: '#555', font: { size: 9 } } },
+                        title: { display: true, text: title.toUpperCase(), color: '#999', font: { size: 10, weight: '900' }, padding: 15 }
                     },
                     scales: (type === 'bar') ? {
-                        y: { grid: { color: '#111' }, ticks: { color: '#444', font: { size: 10 } } },
-                        x: { grid: { display: false }, ticks: { color: '#444', font: { size: 10 } } }
+                        y: { grid: { color: '#111' }, ticks: { color: '#444' } },
+                        x: { grid: { display: false }, ticks: { color: '#444' } }
                     } : {}
                 }
             });
