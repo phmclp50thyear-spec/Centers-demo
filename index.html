@@ -11,10 +11,20 @@
     <style>
         body { background-color: #020202; color: #e5e5e5; overflow: hidden; }
         
+        /* SIDEBAR: AUTO-HIDE LOGIC */
         #sidebar {
             width: 140px; border-right: 1px solid #1a1a1a; background: #050505;
             display: flex; flex-direction: column; height: 100vh; position: fixed;
-            left: 0; top: 0; z-index: 100;
+            left: -135px; /* Hidden state */
+            top: 0; z-index: 100;
+            transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        #sidebar:hover { left: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
+        
+        /* Visual cue for the hidden sidebar */
+        #sidebar::after {
+            content: ""; position: absolute; right: 0; top: 0; bottom: 0;
+            width: 4px; background: #4f46e5; opacity: 0.4;
         }
 
         #deptList { flex-grow: 1; overflow-y: auto; scrollbar-width: none; padding: 10px; }
@@ -26,7 +36,6 @@
             font-size: 9px; font-weight: 800; text-transform: uppercase;
             text-align: center; letter-spacing: 1px; transition: all 0.3s ease;
         }
-
         .dept-btn:hover { color: #fff; border-color: #4f46e5; box-shadow: 0 0 15px rgba(79, 70, 229, 0.4); }
         .dept-btn.active { color: #fff; background: #0a0a1a; border-color: #6366f1; box-shadow: 0 0 20px rgba(99, 102, 241, 0.6); }
 
@@ -54,8 +63,18 @@
             50% { text-shadow: 0 0 25px rgba(99, 102, 241, 0.9), 0 0 40px rgba(99, 102, 241, 0.4); opacity: 1; }
         }
 
-        .neon-card { background: #080808; border-radius: 16px; border: 1px solid #1a1a1a; }
-        .glow-indigo { border-color: #4f46e5; box-shadow: 0 0 25px rgba(79, 70, 229, 0.2); }
+        /* UPDATED: ALL CARDS GLOW BY DEFAULT */
+        .neon-card { 
+            background: #080808; 
+            border-radius: 16px; 
+            border: 1px solid #4f46e5; /* Neon border */
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.15); /* Soft glow */
+            transition: all 0.3s ease;
+        }
+        .neon-card:hover {
+            box-shadow: 0 0 30px rgba(79, 70, 229, 0.3);
+            border-color: #6366f1;
+        }
     </style>
 </head>
 <body class="flex">
@@ -78,7 +97,7 @@
         </div>
     </aside>
 
-    <main class="flex-1 ml-[140px] overflow-y-auto h-screen p-8 bg-[#010101]">
+    <main class="flex-1 overflow-y-auto h-screen p-8 bg-[#010101]">
         <div id="dashboard-content">
             <header class="flex justify-between items-end mb-10">
                 <div>
@@ -92,11 +111,11 @@
             </header>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-                <div class="neon-card p-10 glow-indigo border-l-4">
+                <div class="neon-card p-10 border-l-4 border-l-indigo-500">
                     <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Total Patient Census</p>
                     <h2 id="totalCensus" class="text-8xl font-black mt-2 tracking-tighter">0</h2>
                 </div>
-                <div class="neon-card p-10 border-l-4 border-neutral-800">
+                <div class="neon-card p-10 border-l-4 border-l-indigo-500">
                     <p class="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Type Classification</p>
                     <div id="typeStats" class="flex flex-wrap gap-10 mt-6"></div>
                 </div>
@@ -106,7 +125,7 @@
                 <div class="neon-card p-6 h-[400px]"><canvas id="locChart"></canvas></div>
                 <div class="neon-card p-6 h-[400px]"><canvas id="ageChart"></canvas></div>
             </div>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
                 <div class="neon-card p-6 h-[350px]"><canvas id="genderChart"></canvas></div>
                 <div class="neon-card p-6 h-[350px]"><canvas id="civilChart"></canvas></div>
             </div>
@@ -124,17 +143,19 @@
         async function init() {
             lucide.createIcons();
             let rows = [], page = 0;
-            while (true) {
-                const { data, error } = await sb.from('patients').select('*').range(page * 1000, (page + 1) * 1000 - 1);
-                if (error || !data || data.length === 0) break;
-                rows = [...rows, ...data]; page++;
-                document.getElementById('progressBar').style.width = `${(rows.length / 18841) * 100}%`;
-                if (data.length < 1000) break;
-            }
-            masterData = rows.filter(r => r.location !== '#NAME?' && r.department !== '#NAME?');
-            setupSidebar();
-            document.getElementById('loader').classList.add('hidden');
-            render('all', false);
+            try {
+                while (true) {
+                    const { data, error } = await sb.from('patients').select('*').range(page * 1000, (page + 1) * 1000 - 1);
+                    if (error || !data || data.length === 0) break;
+                    rows = [...rows, ...data]; page++;
+                    document.getElementById('progressBar').style.width = `${Math.min((rows.length / 18841) * 100, 100)}%`;
+                    if (data.length < 1000) break;
+                }
+                masterData = rows.filter(r => r.location !== '#NAME?' && r.department !== '#NAME?');
+                setupSidebar();
+                document.getElementById('loader').classList.add('hidden');
+                render('all', false);
+            } catch (e) { console.error(e); }
         }
 
         function setupSidebar() {
@@ -154,10 +175,8 @@
             content.classList.add('slide-out');
             document.querySelectorAll('.dept-btn').forEach(b => b.classList.remove('active'));
             el.classList.add('active');
-
             await new Promise(r => setTimeout(r, 400));
             render(dept, true);
-            
             content.classList.remove('slide-out');
             content.classList.add('slide-in');
             setTimeout(() => content.classList.remove('slide-in'), 600);
@@ -169,8 +188,7 @@
             const startTime = performance.now();
             function update(now) {
                 const progress = Math.min((now - startTime) / duration, 1);
-                const current = Math.floor(start + progress * (target - start));
-                el.textContent = current.toLocaleString();
+                el.textContent = Math.floor(start + progress * (target - start)).toLocaleString();
                 if (progress < 1) requestAnimationFrame(update);
             }
             requestAnimationFrame(update);
@@ -236,4 +254,3 @@
     </script>
 </body>
 </html>
-
