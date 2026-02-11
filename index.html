@@ -3,84 +3,130 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Center Intelligence - Neon Edition</title>
+    <title>Analytics - Sidebar Command</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background-color: #020202; color: #e5e5e5; }
+        body { background-color: #020202; color: #e5e5e5; overflow-x: hidden; }
         
-        /* Glowing Neon Borders */
-        .neon-card { 
-            background: #080808; 
-            border-radius: 16px; 
-            border: 1px solid #1a1a1a;
+        /* Sidebar Styling */
+        #sidebar {
+            width: 70px;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-right: 1px solid #1a1a1a;
+            background: #050505;
+        }
+
+        .dept-btn {
             position: relative;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 50px;
+            padding: 0 20px;
+            color: #666;
+            transition: all 0.2s;
         }
 
-        .border-glow-indigo { border-color: #4f46e5; box-shadow: 0 0 15px rgba(79, 70, 229, 0.3); }
-        .border-glow-emerald { border-color: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
-        .border-glow-amber { border-color: #f59e0b; box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
-        .border-glow-rose { border-color: #f43f5e; box-shadow: 0 0 15px rgba(244, 63, 94, 0.2); }
+        .dept-btn:hover { color: #fff; background: #0f0f0f; }
+        .dept-btn.active { color: #6366f1; border-right: 3px solid #6366f1; background: #0a0a1a; }
 
-        /* Subtle pulse for the main census */
-        @keyframes pulse {
-            0% { opacity: 0.8; transform: scale(1); }
-            50% { opacity: 1; transform: scale(1.01); }
-            100% { opacity: 0.8; transform: scale(1); }
+        /* Pop-up Label Logic */
+        .dept-label {
+            position: absolute;
+            left: 70px;
+            background: #6366f1;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(-10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 100;
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
         }
-        .census-pulse { animation: pulse 4s infinite ease-in-out; }
 
-        select { background: #000 !important; color: #818cf8 !important; border: 1px solid #333 !important; }
+        .dept-btn:hover .dept-label {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(10px);
+        }
+
+        .neon-card { 
+            background: #080808; border-radius: 16px; border: 1px solid #1a1a1a;
+            transition: all 0.4s ease;
+        }
+        .glow-indigo { border-color: #4f46e5; box-shadow: 0 0 15px rgba(79, 70, 229, 0.2); }
+        .glow-multi { border-color: #222; }
+        .glow-multi:hover { border-color: #444; }
     </style>
 </head>
-<body class="font-sans antialiased">
+<body class="flex h-screen">
 
-    <div id="loader" class="fixed inset-0 bg-black z-[100] flex flex-col items-center justify-center">
+    <div id="loader" class="fixed inset-0 bg-black z-[200] flex flex-col items-center justify-center">
         <div class="w-64 bg-neutral-900 h-1 mb-4 overflow-hidden rounded-full">
-            <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500 shadow-[0_0_20px_#6366f1]"></div>
+            <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500"></div>
         </div>
-        <p id="loadCount" class="text-[10px] font-black tracking-[0.4em] text-indigo-400 uppercase italic">Filtering & Calibrating Data...</p>
+        <p class="text-[10px] font-black tracking-[0.4em] text-indigo-400 uppercase italic">Mounting Command Sidebar...</p>
     </div>
 
-    <nav class="border-b border-neutral-900 bg-black/90 backdrop-blur-xl px-8 py-4 flex justify-between items-center sticky top-0 z-50">
-        <div class="flex items-center gap-4">
-            <div class="h-8 w-1 bg-indigo-500 rounded-full shadow-[0_0_10px_#6366f1]"></div>
-            <div>
-                <h1 class="text-xs font-black uppercase tracking-[0.4em] text-white">Center Command</h1>
-                <p id="syncTime" class="text-[8px] text-neutral-500 font-bold uppercase">Feb 2026 Sync Active</p>
-            </div>
+    <aside id="sidebar" class="flex flex-col items-center py-6 h-full fixed left-0 top-0 z-50">
+        <div class="mb-10 text-indigo-500">
+            <i data-lucide="shield-check" class="w-8 h-8"></i>
         </div>
-        <div class="flex gap-3">
-            <select id="deptSlicer" class="rounded-lg px-4 py-2 text-[10px] uppercase font-bold outline-none"></select>
-            <button onclick="location.reload()" class="bg-neutral-900 hover:bg-neutral-800 text-white px-3 py-2 rounded-lg border border-neutral-800">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+        
+        <div id="deptList" class="flex flex-col w-full gap-2">
+            <button onclick="filterDept('all', this)" class="dept-btn active group">
+                <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                <span class="dept-label">Global View</span>
             </button>
-        </div>
-    </nav>
-
-    <main class="p-6 max-w-[1600px] mx-auto space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div class="neon-card p-8 border-glow-indigo census-pulse">
-                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Global Patient Census</p>
-                <h2 id="totalCensus" class="text-6xl font-black mt-2 tracking-tighter text-white">0</h2>
             </div>
-            <div class="neon-card p-8 border-glow-emerald">
-                <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Patient Classification</p>
+
+        <div class="mt-auto text-neutral-700 hover:text-white cursor-pointer" onclick="location.reload()">
+            <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+        </div>
+    </aside>
+
+    <main class="flex-1 ml-[70px] overflow-y-auto p-8">
+        
+        <header class="flex justify-between items-end mb-10">
+            <div>
+                <h1 class="text-3xl font-black uppercase tracking-tighter text-white">Center Intelligence</h1>
+                <p id="syncInfo" class="text-[10px] text-neutral-500 font-bold uppercase tracking-widest mt-1">Status: Syncing 2026 Data...</p>
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] text-neutral-600 font-bold uppercase">Active Filter</p>
+                <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-sm">GLOBAL VIEW</p>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="neon-card p-8 glow-indigo border-l-4">
+                <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Total Patient Census</p>
+                <h2 id="totalCensus" class="text-7xl font-black mt-2 tracking-tighter">0</h2>
+            </div>
+            <div class="neon-card p-8 glow-multi border-l-4">
+                <p class="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Type Breakdown</p>
                 <div id="typeStats" class="flex flex-wrap gap-8 mt-4"></div>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="neon-card p-6 h-[400px] border-glow-amber"><canvas id="locChart"></canvas></div>
-            <div class="neon-card p-6 h-[400px] border-glow-rose"><canvas id="ageChart"></canvas></div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <div class="neon-card p-6 h-[400px] glow-multi"><canvas id="locChart"></canvas></div>
+            <div class="neon-card p-6 h-[400px] glow-multi"><canvas id="ageChart"></canvas></div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="neon-card p-6 h-[350px] border-glow-indigo"><canvas id="genderChart"></canvas></div>
-            <div class="neon-card p-6 h-[350px] border-glow-emerald"><canvas id="civilChart"></canvas></div>
+            <div class="neon-card p-6 h-[350px] glow-multi"><canvas id="genderChart"></canvas></div>
+            <div class="neon-card p-6 h-[350px] glow-multi"><canvas id="civilChart"></canvas></div>
         </div>
     </main>
 
@@ -90,7 +136,6 @@
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         const chartColors = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#3b82f6', '#f97316'];
-
         let masterData = [], charts = {};
 
         async function init() {
@@ -104,50 +149,64 @@
                 if (data.length < 1000) break;
             }
 
-            // FILTER: Remove any row where location, name, or type is #NAME?
+            // FILTER: Auto-delete #NAME? records
             masterData = rows.filter(r => 
-                r.location !== '#NAME?' && 
-                r.patient_name !== '#NAME?' && 
-                r.department !== '#NAME?' &&
-                r.patient_type !== '#NAME?'
+                r.location !== '#NAME?' && r.department !== '#NAME?' && r.patient_type !== '#NAME?'
             );
 
-            const deptEl = document.getElementById('deptSlicer');
-            deptEl.innerHTML = `<option value="all">Select Department</option>`;
-            [...new Set(masterData.map(d => d.department))].filter(Boolean).sort().forEach(d => {
-                deptEl.innerHTML += `<option value="${d}">${d.toUpperCase()}</option>`;
-            });
-
+            setupSidebar();
             document.getElementById('loader').classList.add('hidden');
-            deptEl.addEventListener('change', render);
-            render();
+            document.getElementById('syncInfo').textContent = `Sync Complete: ${masterData.length.toLocaleString()} Active Records`;
+            render('all');
         }
 
-        function render() {
-            const dVal = document.getElementById('deptSlicer').value;
-            const filtered = dVal === 'all' ? masterData : masterData.filter(d => d.department === dVal);
+        function setupSidebar() {
+            const list = document.getElementById('deptList');
+            const depts = [...new Set(masterData.map(d => d.department))].filter(Boolean).sort();
+            
+            depts.forEach(d => {
+                const btn = document.createElement('button');
+                btn.className = 'dept-btn group';
+                btn.onclick = () => filterDept(d, btn);
+                btn.innerHTML = `
+                    <i data-lucide="building-2" class="w-5 h-5"></i>
+                    <span class="dept-label">${d}</span>
+                `;
+                list.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        function filterDept(dept, el) {
+            document.querySelectorAll('.dept-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('activeDeptLabel').textContent = dept.toUpperCase();
+            render(dept);
+        }
+
+        function render(dept) {
+            const filtered = dept === 'all' ? masterData : masterData.filter(d => d.department === dept);
             document.getElementById('totalCensus').textContent = filtered.length.toLocaleString();
             
+            // Stats & Charts
             const types = {};
             filtered.forEach(d => { types[d.patient_type || 'Other'] = (types[d.patient_type || 'Other'] || 0) + 1; });
             document.getElementById('typeStats').innerHTML = Object.entries(types).map(([t, c], i) => `
-                <div>
-                    <span class="text-[9px] font-black text-neutral-500 uppercase">${t}</span>
-                    <p class="text-2xl font-black" style="color: ${chartColors[i % chartColors.length]}">${c.toLocaleString()}</p>
-                </div>
+                <div><span class="text-[9px] font-black text-neutral-500 uppercase">${t}</span>
+                <p class="text-2xl font-black" style="color:${chartColors[i % chartColors.length]}">${c.toLocaleString()}</p></div>
             `).join('');
 
             const getSet = (k) => {
                 const o = {}; filtered.forEach(d => { const v = d[k] || 'N/A'; o[v] = (o[v] || 0) + 1; });
-                const s = Object.entries(o).sort((a,b) => b[1]-a[1]).slice(0, 10);
+                const s = Object.entries(o).sort((a,b) => b[1]-a[1]).slice(0, 8);
                 return { l: s.map(x => x[0]), v: s.map(x => x[1]) };
             };
 
-            const loc = getSet('location'), age = getSet('age_bracket'), gen = getSet('gender'), civ = getSet('civil_status');
-            draw('locChart', 'bar', loc.l, [{ label: 'Census', data: loc.v, backgroundColor: chartColors }], 'Center Analytics');
-            draw('ageChart', 'bar', age.l, [{ label: 'Census', data: age.v, backgroundColor: [...chartColors].reverse() }], 'Age Demographic');
-            draw('genderChart', 'doughnut', gen.l, [{ data: gen.v, backgroundColor: chartColors, borderWidth: 0 }], 'Gender Split');
-            draw('civilChart', 'pie', civ.l, [{ data: civ.v, backgroundColor: chartColors, borderWidth: 0 }], 'Civil Status');
+            const l = getSet('location'), a = getSet('age_bracket'), g = getSet('gender'), c = getSet('civil_status');
+            draw('locChart', 'bar', l.l, [{ label: 'Census', data: l.v, backgroundColor: chartColors }], 'Location Analysis');
+            draw('ageChart', 'bar', a.l, [{ label: 'Census', data: a.v, backgroundColor: [...chartColors].reverse() }], 'Age Group');
+            draw('genderChart', 'doughnut', g.l, [{ data: g.v, backgroundColor: chartColors, borderWidth: 0 }], 'Gender Split');
+            draw('civilChart', 'pie', c.l, [{ data: c.v, backgroundColor: chartColors, borderWidth: 0 }], 'Civil Status');
         }
 
         function draw(id, type, labels, datasets, title) {
@@ -157,12 +216,12 @@
                 options: {
                     responsive: true, maintainAspectRatio: false,
                     plugins: { 
-                        legend: { position: 'bottom', labels: { color: '#777', font: { size: 9, weight: 'bold' } } },
+                        legend: { position: 'bottom', labels: { color: '#555', font: { size: 9, weight: 'bold' } } },
                         title: { display: true, text: title.toUpperCase(), color: '#fff', font: { size: 10, weight: '900' }, padding: 15 }
                     },
                     scales: (type === 'bar') ? {
-                        y: { grid: { color: '#111' }, ticks: { color: '#555' } },
-                        x: { grid: { display: false }, ticks: { color: '#555' } }
+                        y: { grid: { color: '#111' }, ticks: { color: '#444' } },
+                        x: { grid: { display: false }, ticks: { color: '#444' } }
                     } : {}
                 }
             });
