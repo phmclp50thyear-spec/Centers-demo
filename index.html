@@ -3,21 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketing Intelligence - Stable Flux</title>
+    <title>Marketing Intelligence - Hybrid Engine</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
-        /* RADIANT BORDER LOGIC */
         @property --bg-angle { inherits: false; initial-value: 0deg; syntax: "<angle>"; }
         @keyframes spin { to { --bg-angle: 360deg; } }
 
         body { background-color: #010101; color: #e5e5e5; display: flex; height: 100vh; overflow: hidden; font-family: 'Inter', sans-serif; }
-        
         #sidebar { width: 180px; border-right: 1px solid #1a1a1a; background: #050505; display: flex; flex-direction: column; flex-shrink: 0; z-index: 50;}
         #deptList { flex-grow: 1; overflow-y: auto; scrollbar-width: none; padding: 12px; }
-        #deptList::-webkit-scrollbar { display: none; }
-
         .dept-btn {
             width: 100%; padding: 10px; margin-bottom: 6px; background: #0a0a0a;
             border: 1px solid #1a1a1a; border-radius: 6px; color: #555;
@@ -27,29 +25,20 @@
         .dept-btn.active { color: #fff; border-color: #6366f1; background: #0c0c1e; border-left: 3px solid #6366f1; }
 
         /* NEON CARDS */
-        .neon-card { border: 3px solid transparent; border-radius: 16px; animation: spin 4s infinite linear; }
+        .neon-card { border: 3px solid transparent; border-radius: 16px; animation: spin 4s infinite linear; position: relative; }
         .card-indigo { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #6366f1, #1e1b4b, #6366f1) border-box; }
         .card-emerald { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #10b981, #064e3b, #10b981) border-box; }
         .card-rose { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #f43f5e, #4c0519, #f43f5e) border-box; }
         .card-amber { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #f59e0b, #451a03, #f59e0b) border-box; }
 
-        .pulse-header { animation: headerGlow 3s infinite ease-in-out; }
-        @keyframes headerGlow {
-            0%, 100% { text-shadow: 0 0 10px rgba(99, 102, 241, 0.3); opacity: 0.9; }
-            50% { text-shadow: 0 0 20px rgba(99, 102, 241, 0.7); opacity: 1; }
-        }
-
         main { flex: 1; overflow-y: auto; padding: 30px; }
+        
+        /* Highcharts overrides to match dark theme */
+        .highcharts-background { fill: transparent !important; }
+        .highcharts-title, .highcharts-data-label text { fill: #ffffff !important; font-weight: 900 !important; text-transform: uppercase; }
     </style>
 </head>
 <body>
-
-    <div id="loader" class="fixed inset-0 bg-black z-[300] flex flex-col items-center justify-center">
-        <div class="w-64 bg-neutral-900 h-1 mb-4 overflow-hidden rounded-full">
-            <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500"></div>
-        </div>
-        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Loading System Data...</p>
-    </div>
 
     <aside id="sidebar">
         <div class="p-4 border-b border-neutral-900">
@@ -63,34 +52,28 @@
     <main>
         <header class="flex justify-between items-center mb-8">
             <div>
-                <h1 class="text-2xl font-black uppercase text-white pulse-header">
-                    Marketing Central <span class="text-indigo-500">Intelligence</span>
-                </h1>
-                <p class="text-[10px] text-indigo-400 font-bold uppercase tracking-[0.3em] mt-1">Database: Feb 12, 2026</p>
+                <h1 class="text-2xl font-black uppercase text-white">Marketing <span class="text-indigo-500">Intelligence</span></h1>
+                <p id="activeDeptLabel" class="text-xs font-black uppercase tracking-tighter text-indigo-400">GLOBAL OVERVIEW</p>
             </div>
-            <div class="text-right">
-                <p id="activeDeptLabel" class="text-xl font-black uppercase tracking-tighter text-indigo-500">GLOBAL OVERVIEW</p>
+            <div class="neon-card card-indigo px-6 py-2">
+                <p class="text-[9px] font-black text-indigo-400 uppercase">Census</p>
+                <h2 id="totalCensus" class="text-2xl font-black text-white">0</h2>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="neon-card card-indigo p-8">
-                <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Live Census</p>
-                <h2 id="totalCensus" class="text-8xl font-black mt-1 tracking-tighter text-white">0</h2>
-            </div>
-            <div class="neon-card card-emerald p-8">
-                <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-4">Category Classification</p>
-                <div id="typeStats" class="flex flex-wrap gap-x-12 gap-y-6 mt-4"></div>
-            </div>
+        <div class="neon-card card-emerald p-8 mb-8">
+            <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-4">Category Classification</p>
+            <div id="typeStats" class="flex flex-wrap gap-x-12 gap-y-6"></div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div class="neon-card card-rose p-5 h-[380px]"><canvas id="locChart"></canvas></div>
             <div class="neon-card card-amber p-5 h-[380px]"><canvas id="ageChart"></canvas></div>
         </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
-            <div class="neon-card card-emerald p-5 h-[340px]"><canvas id="genderChart"></canvas></div>
-            <div class="neon-card card-indigo p-5 h-[340px]"><canvas id="civilChart"></canvas></div>
+            <div class="neon-card card-emerald p-5 h-[380px]" id="genderContainer"></div>
+            <div class="neon-card card-indigo p-5 h-[380px]" id="civilContainer"></div>
         </div>
     </main>
 
@@ -98,9 +81,9 @@
         const SUPABASE_URL = 'https://onietgpyfgjahqjmjlud.supabase.co';
         const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uaWV0Z3B5ZmdqYWhxam1qbHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3ODc3MzgsImV4cCI6MjA4NjM2MzczOH0.QYdZZpGSTQd4yZPnpIf8ozxC9yWL3nbGMX3do-Hb0SM';
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const neonPalette = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4', '#ec4899', '#84cc16', '#3b82f6', '#f97316'];
+        const neonPalette = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4'];
 
-        let masterData = [], charts = {};
+        let masterData = [], chartJS_Instances = {};
 
         async function init() {
             let rows = [], page = 0;
@@ -108,12 +91,10 @@
                 const { data, error } = await sb.from('patients').select('*').range(page * 1000, (page + 1) * 1000 - 1);
                 if (error || !data || data.length === 0) break;
                 rows = [...rows, ...data]; page++;
-                document.getElementById('progressBar').style.width = `${Math.min((rows.length / 18841) * 100, 100)}%`;
                 if (data.length < 1000) break;
             }
             masterData = rows.filter(r => r.location !== '#NAME?' && r.department !== '#NAME?');
             setupSidebar();
-            document.getElementById('loader').style.display = 'none';
             render('all');
         }
 
@@ -135,81 +116,91 @@
             render(dept);
         }
 
-        function animateNumber(el, target) {
-            let start = 0;
-            const duration = 1500;
-            const startTime = performance.now();
-            function update(now) {
-                const progress = Math.min((now - startTime) / duration, 1);
-                el.textContent = Math.floor(start + progress * (target - start)).toLocaleString();
-                if (progress < 1) requestAnimationFrame(update);
-            }
-            requestAnimationFrame(update);
-        }
-
         function render(dept) {
             const filtered = dept === 'all' ? masterData : masterData.filter(d => d.department === dept);
-            document.getElementById('activeDeptLabel').textContent = dept === 'all' ? 'GLOBAL OVERVIEW' : dept.toUpperCase();
-            animateNumber(document.getElementById('totalCensus'), filtered.length);
+            document.getElementById('activeDeptLabel').textContent = dept.toUpperCase();
+            document.getElementById('totalCensus').textContent = filtered.length.toLocaleString();
             
             const types = {};
             filtered.forEach(d => { types[d.patient_type || 'Other'] = (types[d.patient_type || 'Other'] || 0) + 1; });
-            
             const statsContainer = document.getElementById('typeStats');
             statsContainer.innerHTML = '';
             Object.entries(types).forEach(([t, c], i) => {
                 const div = document.createElement('div');
                 div.innerHTML = `<span class="text-[11px] font-black text-neutral-400 uppercase tracking-widest">${t}</span>
-                                 <p id="t-cnt-${i}" class="text-4xl font-black" style="color:${neonPalette[i % neonPalette.length]}">0</p>`;
+                                 <p class="text-4xl font-black" style="color:${neonPalette[i % neonPalette.length]}">${c}</p>`;
                 statsContainer.appendChild(div);
-                animateNumber(document.getElementById(`t-cnt-${i}`), c);
             });
+
             updateCharts(filtered);
         }
 
         function updateCharts(data) {
             const getSet = (k) => {
                 const o = {}; data.forEach(d => { const v = d[k] || 'N/A'; o[v] = (o[v] || 0) + 1; });
-                const s = Object.entries(o).sort((a,b) => b[1]-a[1]).slice(0, 8);
-                return { l: s.map(x => x[0]), v: s.map(x => x[1]) };
+                return Object.entries(o).sort((a,b) => b[1]-a[1]).slice(0, 6).map(x => ({ name: x[0], y: x[1] }));
             };
-            draw('locChart', 'bar', getSet('location'), 'Hotspot Locations');
-            draw('ageChart', 'bar', getSet('age_bracket'), 'Age Ranges');
-            draw('genderChart', 'doughnut', getSet('gender'), 'Gender Split');
-            draw('civilChart', 'pie', getSet('civil_status'), 'Civil Status');
+
+            const locData = getSet('location');
+            const ageData = getSet('age_bracket');
+            const genData = getSet('gender');
+            const civData = getSet('civil_status');
+
+            // 1. CHART.JS (BARS)
+            drawBar('locChart', locData, 'Hotspot Locations');
+            drawBar('ageChart', ageData, 'Age Ranges');
+
+            // 2. HIGHCHARTS (DOUGHNUT & PIE)
+            drawHighRadial('genderContainer', genData, 'Gender Split', '75%'); // Doughnut
+            drawHighRadial('civilContainer', civData, 'Civil Status', '0%');   // Pie
         }
 
-        function draw(id, type, set, title) {
-            if (charts[id]) charts[id].destroy();
-            const isBar = type === 'bar';
-
-            charts[id] = new Chart(document.getElementById(id), {
-                type, 
-                data: { labels: set.l, datasets: [{ data: set.v, backgroundColor: neonPalette, borderRadius: isBar ? 6 : 0, borderWidth: 0 }] },
+        function drawBar(id, data, title) {
+            if (chartJS_Instances[id]) chartJS_Instances[id].destroy();
+            chartJS_Instances[id] = new Chart(document.getElementById(id), {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.name),
+                    datasets: [{ data: data.map(d => d.y), backgroundColor: neonPalette, borderRadius: 6 }]
+                },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    // PIE AND DOUGHNUT: ANIMATION REMOVED (Instant Load)
-                    animation: (type === 'pie' || type === 'doughnut') ? false : {
-                        duration: 1000,
-                        easing: 'easeOutQuart'
-                    },
-                    // BAR CHART: Keep the subtle elevator rise
-                    animations: isBar ? {
-                        y: { from: 500, duration: 1000, easing: 'easeOutQuart' }
-                    } : {},
+                    animations: { y: { from: 500, duration: 1000, easing: 'easeOutQuart' } },
                     plugins: { 
-                        legend: { display: !isBar, position: 'bottom', labels: { color: '#666', font: { size: 8 } } },
-                        title: { display: true, text: title.toUpperCase(), color: '#fff', font: { size: 10, weight: '900' }, padding: 15 }
+                        legend: { display: false },
+                        title: { display: true, text: title.toUpperCase(), color: '#fff', font: { weight: '900', size: 12 } }
                     },
-                    scales: isBar ? {
-                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: '#fff', font: { weight: 'bold', size: 9 } } },
-                        x: { grid: { display: false }, ticks: { color: '#fff', font: { weight: 'bold', size: 9 } } }
-                    } : {}
+                    scales: {
+                        y: { ticks: { color: '#666' }, grid: { color: '#1a1a1a' } },
+                        x: { ticks: { color: '#fff', font: { weight: 'bold' } }, grid: { display: false } }
+                    }
                 }
             });
         }
+
+        function drawHighRadial(container, data, title, innerSize) {
+            Highcharts.chart(container, {
+                chart: { type: 'pie', backgroundColor: 'transparent' },
+                title: { text: title.toUpperCase(), style: { color: '#FFFFFF', fontSize: '12px', fontWeight: '900' } },
+                tooltip: { pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>' },
+                plotOptions: {
+                    pie: {
+                        innerSize: innerSize,
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        borderRadius: 8,
+                        dataLabels: {
+                            enabled: true,
+                            format: '<b>{point.name}</b>: {point.percentage:.1f}%',
+                            style: { color: '#ccc', textOutline: 'none' }
+                        }
+                    }
+                },
+                series: [{ name: 'Total', colorByPoint: true, data: data }]
+            });
+        }
+
         init();
     </script>
 </body>
 </html>
-
