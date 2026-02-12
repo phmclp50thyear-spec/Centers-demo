@@ -3,22 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketing Intelligence - Radiant Flux</title>
+    <title>Marketing Intelligence - Cinematic Flux</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* THE ANIMATED BORDER LOGIC */
-        @property --bg-angle {
-            inherits: false;
-            initial-value: 0deg;
-            syntax: "<angle>";
-        }
-
-        @keyframes spin {
-            to { --bg-angle: 360deg; }
-        }
+        /* RADIANT BORDER LOGIC */
+        @property --bg-angle { inherits: false; initial-value: 0deg; syntax: "<angle>"; }
+        @keyframes spin { to { --bg-angle: 360deg; } }
 
         body { background-color: #010101; color: #e5e5e5; display: flex; height: 100vh; overflow: hidden; font-family: 'Inter', sans-serif; }
         
@@ -34,17 +27,12 @@
         }
         .dept-btn.active { color: #fff; border-color: #6366f1; background: #0c0c1e; border-left: 3px solid #6366f1; }
 
-        /* NEON RADIANT CARDS */
+        /* RADIANT CARDS */
         .neon-card {
             border: 3px solid transparent;
             border-radius: 16px;
-            background: 
-                linear-gradient(#080808, #080808) padding-box,
-                conic-gradient(from var(--bg-angle), #6366f1, #a855f7, #6366f1) border-box;
             animation: spin 4s infinite linear;
         }
-
-        /* Unique card colors using the Radiant technique */
         .card-indigo { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #6366f1, #1e1b4b, #6366f1) border-box; }
         .card-emerald { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #10b981, #064e3b, #10b981) border-box; }
         .card-rose { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #f43f5e, #4c0519, #f43f5e) border-box; }
@@ -71,12 +59,12 @@
         <div class="w-64 bg-neutral-900 h-1 mb-4 overflow-hidden rounded-full">
             <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500"></div>
         </div>
-        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Generating Radiant Grids...</p>
+        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Deploying Kinetic Visuals...</p>
     </div>
 
     <aside id="sidebar">
         <div class="p-4 border-b border-neutral-900">
-             <h2 class="text-[9px] font-black text-neutral-600 uppercase tracking-widest">Network</h2>
+             <h2 class="text-[9px] font-black text-neutral-600 uppercase tracking-widest">Command</h2>
         </div>
         <div id="deptList">
             <button onclick="handleFilterChange('all', this)" class="dept-btn active">Global Grid</button>
@@ -99,11 +87,11 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <div class="neon-card card-indigo p-8">
                 <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Live Census</p>
-                <h2 id="totalCensus" class="text-7xl font-black mt-1 tracking-tighter text-white">0</h2>
+                <h2 id="totalCensus" class="text-8xl font-black mt-1 tracking-tighter text-white">0</h2>
             </div>
             <div class="neon-card card-emerald p-8">
-                <p class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Category Classification</p>
-                <div id="typeStats" class="flex flex-wrap gap-8 mt-4"></div>
+                <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-4">Category Classification</p>
+                <div id="typeStats" class="flex flex-wrap gap-x-12 gap-y-6 mt-4"></div>
             </div>
         </div>
 
@@ -177,12 +165,14 @@
             
             const types = {};
             filtered.forEach(d => { types[d.patient_type || 'Other'] = (types[d.patient_type || 'Other'] || 0) + 1; });
+            
+            // FONT SIZE ADJUSTMENT HERE
             const statsContainer = document.getElementById('typeStats');
             statsContainer.innerHTML = '';
             Object.entries(types).forEach(([t, c], i) => {
                 const div = document.createElement('div');
-                div.innerHTML = `<span class="text-[8px] font-black text-neutral-500 uppercase">${t}</span>
-                                 <p id="t-cnt-${i}" class="text-xl font-black" style="color:${neonPalette[i % neonPalette.length]}">0</p>`;
+                div.innerHTML = `<span class="text-[11px] font-black text-neutral-400 uppercase tracking-widest">${t}</span>
+                                 <p id="t-cnt-${i}" class="text-4xl font-black" style="color:${neonPalette[i % neonPalette.length]}">0</p>`;
                 statsContainer.appendChild(div);
                 animateNumber(document.getElementById(`t-cnt-${i}`), c);
             });
@@ -210,10 +200,14 @@
                 data: { labels: set.l, datasets: [{ data: set.v, backgroundColor: neonPalette, borderRadius: isBar ? 6 : 0 }] },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    animation: { 
-                        duration: 3000, 
-                        easing: 'easeOutQuart',
-                        delay: (context) => context.dataIndex * 150 
+                    // KINETIC RISE ANIMATION (TranslateY Style)
+                    animations: {
+                        y: {
+                            from: 500, // Starts way below the chart area
+                            duration: 2500,
+                            easing: 'easeOutQuart',
+                            delay: (ctx) => ctx.dataIndex * 150
+                        }
                     },
                     plugins: { 
                         legend: { display: !isBar, position: 'bottom', labels: { color: '#666', font: { size: 8 } } },
