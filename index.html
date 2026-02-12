@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketing Intelligence - Precision Layout</title>
+    <title>Marketing Intelligence - Adaptive Layout</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://code.highcharts.com/highcharts.js"></script>
@@ -14,27 +14,28 @@
         @keyframes spin { to { --bg-angle: 360deg; } }
 
         body { background-color: #010101; color: #e5e5e5; display: flex; height: 100vh; overflow: hidden; font-family: 'Inter', sans-serif; }
-        #sidebar { width: 180px; border-right: 1px solid #1a1a1a; background: #050505; display: flex; flex-direction: column; flex-shrink: 0; z-index: 50;}
-        #deptList { flex-grow: 1; overflow-y: auto; scrollbar-width: none; padding: 12px; }
+        
+        #sidebar { width: 160px; border-right: 1px solid #1a1a1a; background: #050505; display: flex; flex-direction: column; flex-shrink: 0; z-index: 50;}
+        #deptList { flex-grow: 1; overflow-y: auto; scrollbar-width: none; padding: 10px; }
         
         .dept-btn {
-            width: 100%; padding: 10px; margin-bottom: 6px; background: #0a0a0a;
-            border: 1px solid #1a1a1a; border-radius: 6px; color: #555;
-            font-size: 9px; font-weight: 800; text-transform: uppercase;
-            text-align: left; letter-spacing: 1px; transition: all 0.3s ease;
+            width: 100%; padding: 8px; margin-bottom: 4px; background: #0a0a0a;
+            border: 1px solid #1a1a1a; border-radius: 6px; color: #444;
+            font-size: 8px; font-weight: 800; text-transform: uppercase;
+            text-align: left; letter-spacing: 1px; transition: all 0.2s ease;
         }
         .dept-btn.active { color: #fff; border-color: #6366f1; background: #0c0c1e; border-left: 3px solid #6366f1; }
 
-        /* NEON CARDS - STYLIZED */
-        .neon-card { border: 2px solid transparent; border-radius: 12px; animation: spin 4s infinite linear; position: relative; height: 100%; }
+        /* NEON CARDS */
+        .neon-card { border: 2px solid transparent; border-radius: 12px; animation: spin 4s infinite linear; position: relative; }
         .card-indigo { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #6366f1, #1e1b4b, #6366f1) border-box; }
         .card-emerald { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #10b981, #064e3b, #10b981) border-box; }
         .card-rose { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #f43f5e, #4c0519, #f43f5e) border-box; }
         .card-amber { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #f59e0b, #451a03, #f59e0b) border-box; }
 
-        main { flex: 1; overflow-y: auto; padding: 25px; }
+        main { flex: 1; overflow-y: auto; padding: 20px; }
         
-        /* Highcharts Clear Fix */
+        /* Highcharts container logic */
         .highcharts-container { width: 100% !important; height: 100% !important; }
         .highcharts-background { fill: transparent !important; }
     </style>
@@ -43,7 +44,7 @@
 
     <aside id="sidebar">
         <div class="p-4 border-b border-neutral-900">
-             <h2 class="text-[9px] font-black text-neutral-600 uppercase tracking-widest">Database</h2>
+             <h2 class="text-[8px] font-black text-neutral-600 uppercase tracking-widest">Database</h2>
         </div>
         <div id="deptList">
             <button onclick="handleFilterChange('all', this)" class="dept-btn active">Global Grid</button>
@@ -51,21 +52,26 @@
     </aside>
 
     <main>
-        <header class="flex justify-between items-end mb-6">
+        <header class="flex justify-between items-center mb-6">
             <div>
                 <h1 class="text-xl font-black uppercase text-white tracking-tighter">Command <span class="text-indigo-500">Center</span></h1>
+            </div>
+            <div class="text-right">
                 <p id="activeDeptLabel" class="text-[10px] font-bold uppercase text-indigo-400 tracking-[0.2em]">GLOBAL OVERVIEW</p>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="neon-card card-indigo p-6 flex flex-col justify-center">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            <div class="neon-card card-indigo p-8">
                 <p class="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Live Census</p>
-                <h2 id="totalCensus" class="text-5xl font-black text-white tracking-tighter">0</h2>
+                <h2 id="totalCensus" class="text-7xl font-black text-white tracking-tighter leading-tight">0</h2>
             </div>
             
-            <div id="typeStats" class="md:col-span-2 grid grid-cols-2 gap-4">
-                </div>
+            <div class="neon-card card-emerald p-8">
+                <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest mb-4">Classification Matrix</p>
+                <div id="typeStats" class="flex flex-wrap gap-x-8 gap-y-4">
+                    </div>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-10">
@@ -75,15 +81,14 @@
             <div class="neon-card card-amber p-4 h-[350px]">
                 <canvas id="ageChart"></canvas>
             </div>
-            
             <div class="neon-card card-emerald p-2 h-[350px]" id="genderContainer"></div>
             <div class="neon-card card-indigo p-2 h-[350px]" id="civilContainer"></div>
         </div>
     </main>
 
     <script>
-        const SUPABASE_URL = 'https://onietgpyfgjahqjmjlud.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9uaWV0Z3B5ZmdqYWhxam1qbHVkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA3ODc3MzgsImV4cCI6MjA4NjM2MzczOH0.QYdZZpGSTQd4yZPnpIf8ozxC9yWL3nbGMX3do-Hb0SM';
+        const SUPABASE_URL = 'https://onietgpyfgjahqjmjlud.supabaseco'; // Add your specific URL back
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; // Add your specific Key back
         const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         const neonPalette = ['#6366f1', '#10b981', '#f59e0b', '#f43f5e', '#8b5cf6', '#06b6d4'];
 
@@ -130,11 +135,14 @@
             
             const statsContainer = document.getElementById('typeStats');
             statsContainer.innerHTML = '';
+            
             Object.entries(types).forEach(([t, c], i) => {
                 const div = document.createElement('div');
-                div.className = "neon-card card-emerald p-4 flex flex-col justify-center";
-                div.innerHTML = `<span class="text-[9px] font-black text-emerald-400 uppercase tracking-widest">${t}</span>
-                                 <p class="text-3xl font-black text-white">${c.toLocaleString()}</p>`;
+                // Added responsive font logic here
+                div.innerHTML = `
+                    <p class="text-[8px] font-black text-neutral-500 uppercase tracking-widest">${t}</p>
+                    <p class="text-3xl font-black text-white leading-none">${c.toLocaleString()}</p>
+                `;
                 statsContainer.appendChild(div);
             });
 
@@ -149,7 +157,7 @@
 
             drawBar('locChart', getSet('location'), 'Hotspot Locations');
             drawBar('ageChart', getSet('age_bracket'), 'Age Ranges');
-            drawHighRadial('genderContainer', getSet('gender'), 'Gender Split', '70%');
+            drawHighRadial('genderContainer', getSet('gender'), 'Gender Distribution', '65%');
             drawHighRadial('civilContainer', getSet('civil_status'), 'Civil Status', '0%');
         }
 
@@ -178,13 +186,14 @@
 
         function drawHighRadial(container, data, title, innerSize) {
             Highcharts.chart(container, {
-                chart: { type: 'pie', backgroundColor: 'transparent', spacing: [10, 10, 10, 10] },
+                chart: { type: 'pie', backgroundColor: 'transparent' },
                 title: { text: title.toUpperCase(), style: { color: '#FFFFFF', fontSize: '10px', fontWeight: '900' } },
                 credits: { enabled: false },
                 plotOptions: {
                     pie: {
                         innerSize: innerSize,
-                        borderRadius: 5,
+                        borderRadius: 6,
+                        borderWidth: 0,
                         dataLabels: {
                             enabled: true,
                             format: '{point.name}',
