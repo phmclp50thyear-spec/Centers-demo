@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Command - Pulse Edition</title>
+    <title>Marketing Central Intelligence - Feb 12</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -21,7 +21,6 @@
         }
         #sidebar:hover { left: 0; box-shadow: 10px 0 30px rgba(0,0,0,0.8); }
         
-        /* Visual cue for the hidden sidebar */
         #sidebar::after {
             content: ""; position: absolute; right: 0; top: 0; bottom: 0;
             width: 4px; background: #4f46e5; opacity: 0.4;
@@ -52,7 +51,6 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
-        /* NEON PULSE ANIMATION */
         .pulse-text {
             animation: neonPulse 2s infinite ease-in-out;
             text-shadow: 0 0 5px rgba(99, 102, 241, 0.2);
@@ -63,12 +61,11 @@
             50% { text-shadow: 0 0 25px rgba(99, 102, 241, 0.9), 0 0 40px rgba(99, 102, 241, 0.4); opacity: 1; }
         }
 
-        /* UPDATED: ALL CARDS GLOW BY DEFAULT */
         .neon-card { 
             background: #080808; 
             border-radius: 16px; 
-            border: 1px solid #4f46e5; /* Neon border */
-            box-shadow: 0 0 20px rgba(79, 70, 229, 0.15); /* Soft glow */
+            border: 1px solid #4f46e5;
+            box-shadow: 0 0 20px rgba(79, 70, 229, 0.15);
             transition: all 0.3s ease;
         }
         .neon-card:hover {
@@ -101,8 +98,12 @@
         <div id="dashboard-content">
             <header class="flex justify-between items-end mb-10">
                 <div>
-                    <h1 class="text-3xl font-black uppercase tracking-tighter text-white">Center <span class="text-indigo-500">Intelligence</span></h1>
-                    <p class="text-[9px] text-neutral-500 font-bold uppercase tracking-widest mt-1">Live Database Feed v2.0</p>
+                    <h1 class="text-3xl font-black uppercase tracking-tighter text-white">
+                        Marketing Central <span class="text-indigo-500">Intelligence</span>
+                    </h1>
+                    <p class="text-[9px] text-neutral-500 font-bold uppercase tracking-widest mt-1">
+                        Database as of Feb 12
+                    </p>
                 </div>
                 <div class="text-right">
                     <p class="text-[9px] text-neutral-600 font-black uppercase tracking-[0.2em]">Active Department</p>
@@ -235,16 +236,31 @@
         function draw(id, type, labels, data, title, colors, animate) {
             if (charts[id]) charts[id].destroy();
             charts[id] = new Chart(document.getElementById(id), {
-                type, data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: type === 'bar' ? 5 : 0, borderWidth: 0 }] },
+                type, 
+                data: { 
+                    labels, 
+                    datasets: [{ 
+                        data, 
+                        backgroundColor: colors, 
+                        borderRadius: type === 'bar' ? 5 : 0, 
+                        borderWidth: 0 
+                    }] 
+                },
                 options: {
-                    responsive: true, maintainAspectRatio: false,
-                    animation: { duration: animate ? 1000 : 0, easing: 'easeOutQuart' },
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    animation: { 
+                        duration: 1500, // Slightly longer for the "filling" effect
+                        easing: 'easeOutQuart',
+                        // This forces the animation to grow from 0
+                        delay: (context) => context.dataIndex * 50 
+                    },
                     plugins: { 
                         legend: { position: 'bottom', labels: { color: '#555', font: { size: 9, weight: 'bold' } } },
                         title: { display: true, text: title.toUpperCase(), color: '#fff', font: { size: 10, weight: '900' }, padding: 15 }
                     },
                     scales: (type === 'bar') ? {
-                        y: { grid: { color: '#111' }, ticks: { color: '#444' } },
+                        y: { beginAtZero: true, grid: { color: '#111' }, ticks: { color: '#444' } },
                         x: { grid: { display: false }, ticks: { color: '#444', font: { size: 8 } } }
                     } : {}
                 }
@@ -254,4 +270,3 @@
     </script>
 </body>
 </html>
-
