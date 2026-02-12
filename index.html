@@ -9,7 +9,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* RADIANT BORDER LOGIC */
+        /* CSS REFERENCE ANIMATION: RADIANT BORDERS */
         @property --bg-angle { inherits: false; initial-value: 0deg; syntax: "<angle>"; }
         @keyframes spin { to { --bg-angle: 360deg; } }
 
@@ -27,7 +27,7 @@
         }
         .dept-btn.active { color: #fff; border-color: #6366f1; background: #0c0c1e; border-left: 3px solid #6366f1; }
 
-        /* RADIANT CARDS */
+        /* NEON CARDS WITH SPINNING BORDERS */
         .neon-card { border: 3px solid transparent; border-radius: 16px; animation: spin 4s infinite linear; }
         .card-indigo { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #6366f1, #1e1b4b, #6366f1) border-box; }
         .card-emerald { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #10b981, #064e3b, #10b981) border-box; }
@@ -40,12 +40,6 @@
             50% { text-shadow: 0 0 20px rgba(99, 102, 241, 0.7); opacity: 1; }
         }
 
-        .pulse-dept { animation: deptGlow 2s infinite ease-in-out; color: #6366f1; }
-        @keyframes deptGlow {
-            0%, 100% { text-shadow: 0 0 8px rgba(99, 102, 241, 0.4); }
-            50% { text-shadow: 0 0 18px rgba(99, 102, 241, 0.8); }
-        }
-
         main { flex: 1; overflow-y: auto; padding: 30px; }
     </style>
 </head>
@@ -55,15 +49,15 @@
         <div class="w-64 bg-neutral-900 h-1 mb-4 overflow-hidden rounded-full">
             <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500"></div>
         </div>
-        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Synchronizing Visual Engines...</p>
+        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Initializing Wipe Sequences...</p>
     </div>
 
     <aside id="sidebar">
         <div class="p-4 border-b border-neutral-900">
-             <h2 class="text-[9px] font-black text-neutral-600 uppercase tracking-widest">Command</h2>
+             <h2 class="text-[9px] font-black text-neutral-600 uppercase tracking-widest">Database</h2>
         </div>
         <div id="deptList">
-            <button onclick="handleFilterChange('all', this)" class="dept-btn active">Global Grid</button>
+            <button id="globalBtn" onclick="handleFilterChange('all', this)" class="dept-btn active">Global Grid</button>
         </div>
     </aside>
 
@@ -73,10 +67,10 @@
                 <h1 class="text-2xl font-black uppercase text-white pulse-header">
                     Marketing Central <span class="text-indigo-500">Intelligence</span>
                 </h1>
-                <p class="text-[10px] text-indigo-400 font-bold uppercase tracking-[0.3em] mt-1">Database: Feb 12, 2026</p>
+                <p class="text-[10px] text-indigo-400 font-bold uppercase tracking-[0.3em] mt-1">Status: Operational</p>
             </div>
             <div class="text-right">
-                <p id="activeDeptLabel" class="text-xl pulse-dept font-black uppercase tracking-tighter">GLOBAL OVERVIEW</p>
+                <p id="activeDeptLabel" class="text-xl font-black uppercase tracking-tighter text-indigo-500">GLOBAL OVERVIEW</p>
             </div>
         </header>
 
@@ -189,45 +183,28 @@
         function draw(id, type, set, title) {
             if (charts[id]) charts[id].destroy();
             const isBar = type === 'bar';
-            const isPie = type === 'pie';
-            const isDoughnut = type === 'doughnut';
-
-            // DOUGHNUT ANIMATION LOGIC (REPLICATING CSS MIXIN)
-            // It uses a sequential rotation delay for each quadrant
-            const doughnutAnimation = {
-                duration: 2000,
-                easing: 'linear',
-                animateRotate: true,
-                animateScale: false,
-                delay: (context) => context.dataIndex * 500 // Speed from CSS mixin
-            };
-
-            // PIE ANIMATION LOGIC (REPLICATING HIGHCHARTS)
-            // Highcharts pie charts expand radially while rotating
-            const pieAnimation = {
-                duration: 1500,
-                easing: 'easeOutBounce', // Gives that Highcharts "snap"
-                animateRotate: true,
-                animateScale: true,
-            };
 
             charts[id] = new Chart(document.getElementById(id), {
                 type, 
-                data: { 
-                    labels: set.l, 
-                    datasets: [{ 
-                        data: set.v, 
-                        backgroundColor: neonPalette, 
-                        borderRadius: isBar ? 6 : 0,
-                        borderWidth: 0
-                    }] 
-                },
+                data: { labels: set.l, datasets: [{ data: set.v, backgroundColor: neonPalette, borderRadius: isBar ? 6 : 0, borderWidth: 0 }] },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    animation: isPie ? pieAnimation : (isDoughnut ? doughnutAnimation : {
-                        // BAR CHART ELEVATOR ANIMATION
-                        y: { from: 600, duration: 2000, easing: 'easeOutQuart', delay: (ctx) => ctx.dataIndex * 150 }
-                    }),
+                    // THE "TIMER WIPE" ANIMATION LOGIC
+                    animation: {
+                        duration: 3000,
+                        easing: 'easeInOutQuart'
+                    },
+                    animations: {
+                        // For Pie/Doughnut: This forces the circle to wipe from 0% to 100%
+                        circumference: {
+                            from: 0,
+                            to: 360,
+                            duration: 3000,
+                            easing: 'easeInOutQuart'
+                        },
+                        // For Bars: Elevator rise effect
+                        y: isBar ? { from: 800, duration: 2000, easing: 'easeOutQuart' } : {}
+                    },
                     plugins: { 
                         legend: { display: !isBar, position: 'bottom', labels: { color: '#666', font: { size: 8 } } },
                         title: { display: true, text: title.toUpperCase(), color: '#fff', font: { size: 10, weight: '900' }, padding: 15 }
