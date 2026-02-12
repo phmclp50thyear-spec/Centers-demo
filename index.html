@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketing Central Intelligence - Feb 12</title>
+    <title>Marketing Central Intelligence - Neon Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background-color: #020202; color: #e5e5e5; display: flex; height: 100vh; overflow: hidden; }
+        body { background-color: #020202; color: #e5e5e5; display: flex; height: 100vh; overflow: hidden; font-family: 'Inter', sans-serif; }
         
         /* FIXED SIDEBAR */
         #sidebar {
@@ -34,71 +34,91 @@
             border-left: 4px solid #6366f1;
         }
 
-        /* NEON LABELS */
-        .neon-white {
-            color: #ffffff;
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5), 0 0 10px rgba(99, 102, 241, 0.3);
+        /* GLOWING HEADERS */
+        .glow-header {
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4), 0 0 30px rgba(99, 102, 241, 0.3);
+        }
+        .glow-sub {
+            text-shadow: 0 0 10px rgba(99, 102, 241, 0.6);
         }
 
-        .neon-card { 
-            background: #080808; border-radius: 16px; border: 1px solid #4f46e5;
-            box-shadow: 0 0 20px rgba(79, 70, 229, 0.1); transition: all 0.3s ease;
+        /* DEPARTMENT PULSE GLOW (TOP RIGHT) */
+        .pulse-dept {
+            animation: pulseGlow 2s infinite ease-in-out;
+            color: #6366f1;
+            font-weight: 900;
         }
+
+        @keyframes pulseGlow {
+            0%, 100% { text-shadow: 0 0 10px rgba(99, 102, 241, 0.5); opacity: 0.8; }
+            50% { text-shadow: 0 0 25px rgba(99, 102, 241, 1), 0 0 40px rgba(99, 102, 241, 0.5); opacity: 1; }
+        }
+
+        /* MULTI-COLOR NEON BORDERS */
+        .border-indigo { border: 1px solid #6366f1; box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
+        .border-emerald { border: 1px solid #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); }
+        .border-rose { border: 1px solid #f43f5e; box-shadow: 0 0 15px rgba(244, 63, 94, 0.2); }
+        .border-amber { border: 1px solid #f59e0b; box-shadow: 0 0 15px rgba(245, 158, 11, 0.2); }
+
+        .neon-card { background: #080808; border-radius: 16px; transition: all 0.3s ease; }
+        .neon-card:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(255, 255, 255, 0.1); }
         
-        main { flex-1; overflow-y: auto; background: #010101; padding: 40px; }
+        main { flex: 1; overflow-y: auto; background: #010101; padding: 40px; }
+        .neon-white-text { color: #fff; text-shadow: 0 0 8px rgba(255,255,255,0.4); }
     </style>
 </head>
 <body>
 
     <div id="loader" class="fixed inset-0 bg-black z-[300] flex flex-col items-center justify-center">
         <div class="w-64 bg-neutral-900 h-1 mb-4 overflow-hidden rounded-full">
-            <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500 shadow-[0_0_15px_#6366f1]"></div>
+            <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500"></div>
         </div>
-        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Igniting Marketing Engine...</p>
+        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Synchronizing Neural Grids...</p>
     </div>
 
     <aside id="sidebar">
         <div class="p-6 border-b border-neutral-900">
-             <h2 class="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Departments</h2>
+             <h2 class="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Command Center</h2>
         </div>
         <div id="deptList">
-            <button onclick="handleFilterChange('all', this)" class="dept-btn active">Overview</button>
+            <button onclick="handleFilterChange('all', this)" class="dept-btn active">Global Overview</button>
         </div>
     </aside>
 
-    <main class="w-full">
-        <header class="flex justify-between items-end mb-10">
+    <main>
+        <header class="flex justify-between items-start mb-10">
             <div>
-                <h1 class="text-3xl font-black uppercase tracking-tighter text-white">
+                <h1 class="text-4xl font-black uppercase tracking-tighter text-white glow-header">
                     Marketing Central <span class="text-indigo-500">Intelligence</span>
                 </h1>
-                <p class="text-[10px] text-neutral-400 font-bold uppercase tracking-[0.3em] mt-1">
+                <p class="text-[11px] text-indigo-400 font-bold uppercase tracking-[0.4em] mt-2 glow-sub">
                     Database as of Feb 12
                 </p>
             </div>
             <div class="text-right">
-                <p id="activeDeptLabel" class="text-indigo-400 font-black uppercase text-2xl tracking-tighter">GLOBAL OVERVIEW</p>
+                <p class="text-[10px] text-neutral-500 font-black uppercase tracking-widest mb-1">System Sector</p>
+                <p id="activeDeptLabel" class="text-3xl pulse-dept tracking-tighter">GLOBAL OVERVIEW</p>
             </div>
         </header>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div class="neon-card p-10 border-l-4 border-l-indigo-500">
+            <div class="neon-card p-10 border-l-8 border-indigo-500 border-indigo">
                 <p class="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Total Patient Census</p>
-                <h2 id="totalCensus" class="text-8xl font-black mt-2 tracking-tighter neon-white">0</h2>
+                <h2 id="totalCensus" class="text-8xl font-black mt-2 tracking-tighter neon-white-text">0</h2>
             </div>
-            <div class="neon-card p-10 border-l-4 border-l-indigo-500">
-                <p class="text-[10px] font-black text-neutral-500 uppercase tracking-widest">Type Classification</p>
+            <div class="neon-card p-10 border-l-8 border-emerald-500 border-emerald">
+                <p class="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Classification Flux</p>
                 <div id="typeStats" class="flex flex-wrap gap-10 mt-6"></div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="neon-card p-6 h-[400px]"><canvas id="locChart"></canvas></div>
-            <div class="neon-card p-6 h-[400px]"><canvas id="ageChart"></canvas></div>
+            <div class="neon-card p-6 h-[400px] border-rose"><canvas id="locChart"></canvas></div>
+            <div class="neon-card p-6 h-[400px] border-amber"><canvas id="ageChart"></canvas></div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
-            <div class="neon-card p-6 h-[350px]"><canvas id="genderChart"></canvas></div>
-            <div class="neon-card p-6 h-[350px]"><canvas id="civilChart"></canvas></div>
+            <div class="neon-card p-6 h-[350px] border-emerald"><canvas id="genderChart"></canvas></div>
+            <div class="neon-card p-6 h-[350px] border-indigo"><canvas id="civilChart"></canvas></div>
         </div>
     </main>
 
@@ -122,7 +142,7 @@
             }
             masterData = rows.filter(r => r.location !== '#NAME?' && r.department !== '#NAME?');
             setupSidebar();
-            document.getElementById('loader').classList.add('hidden');
+            document.getElementById('loader').style.display = 'none';
             render('all');
         }
 
@@ -146,11 +166,12 @@
 
         function animateNumber(el, target) {
             let start = 0;
-            const duration = 1000;
+            const duration = 1200;
             const startTime = performance.now();
             function update(now) {
                 const progress = Math.min((now - startTime) / duration, 1);
-                el.textContent = Math.floor(start + progress * (target - start)).toLocaleString();
+                const eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+                el.textContent = Math.floor(start + eased * (target - start)).toLocaleString();
                 if (progress < 1) requestAnimationFrame(update);
             }
             requestAnimationFrame(update);
@@ -187,60 +208,29 @@
             
             const l = getSet('location'), a = getSet('age_bracket'), g = getSet('gender'), c = getSet('civil_status');
             
-            draw('locChart', 'bar', l.l, l.v, 'Hotspot Locations', '#6366f1');
-            draw('ageChart', 'bar', a.l, a.v, 'Age Distribution', '#10b981');
+            draw('locChart', 'bar', l.l, l.v, 'Hotspot Locations', '#f43f5e');
+            draw('ageChart', 'bar', a.l, a.v, 'Age Distribution', '#f59e0b');
             draw('genderChart', 'doughnut', g.l, g.v, 'Gender Split', chartColors);
             draw('civilChart', 'pie', c.l, c.v, 'Civil Status', chartColors);
         }
 
         function draw(id, type, labels, data, title, colors) {
             if (charts[id]) charts[id].destroy();
-            
             const isBar = type === 'bar';
 
             charts[id] = new Chart(document.getElementById(id), {
                 type, 
-                data: { 
-                    labels, 
-                    datasets: [{ 
-                        data, 
-                        backgroundColor: colors, 
-                        borderRadius: isBar ? 8 : 0, 
-                        borderWidth: 0 
-                    }] 
-                },
+                data: { labels, datasets: [{ data, backgroundColor: colors, borderRadius: isBar ? 12 : 0 }] },
                 options: {
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    // FORCED GROWTH ANIMATION
-                    animation: {
-                        duration: 1200,
-                        easing: 'easeOutElastic'
-                    },
+                    responsive: true, maintainAspectRatio: false,
+                    animation: { duration: 1500, easing: 'easeOutQuart' },
                     plugins: { 
-                        legend: { 
-                            display: !isBar, // Hide legends for bar charts
-                            position: 'bottom', 
-                            labels: { color: '#888', font: { size: 9, weight: 'bold' } } 
-                        },
-                        title: { 
-                            display: true, 
-                            text: title.toUpperCase(), 
-                            color: '#fff', 
-                            font: { size: 11, weight: '900' }, 
-                            padding: 20 
-                        }
+                        legend: { display: !isBar, position: 'bottom', labels: { color: '#888', font: { size: 9, weight: 'bold' } } },
+                        title: { display: true, text: title.toUpperCase(), color: '#fff', font: { size: 11, weight: '900' }, padding: 25 }
                     },
                     scales: isBar ? {
-                        y: { 
-                            beginAtZero: true, 
-                            grid: { color: 'rgba(255,255,255,0.05)' }, 
-                            ticks: { color: '#ffffff', font: { weight: 'bold' } } 
-                        },
-                        x: { 
-                            grid: { display: false }, 
-                            ticks: { color: '#ffffff', font: { size: 9, weight: 'bold' } } 
-                        }
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#ffffff', font: { weight: 'bold' } } },
+                        x: { grid: { display: false }, ticks: { color: '#ffffff', font: { size: 10, weight: 'bold' } } }
                     } : {}
                 }
             });
