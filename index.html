@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketing Intelligence - Cinematic Flux</title>
+    <title>Marketing Intelligence - Stable Flux</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* CSS REFERENCE ANIMATION: RADIANT BORDERS */
+        /* RADIANT BORDER LOGIC */
         @property --bg-angle { inherits: false; initial-value: 0deg; syntax: "<angle>"; }
         @keyframes spin { to { --bg-angle: 360deg; } }
 
@@ -27,7 +26,7 @@
         }
         .dept-btn.active { color: #fff; border-color: #6366f1; background: #0c0c1e; border-left: 3px solid #6366f1; }
 
-        /* NEON CARDS WITH SPINNING BORDERS */
+        /* NEON CARDS */
         .neon-card { border: 3px solid transparent; border-radius: 16px; animation: spin 4s infinite linear; }
         .card-indigo { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #6366f1, #1e1b4b, #6366f1) border-box; }
         .card-emerald { background: linear-gradient(#080808, #080808) padding-box, conic-gradient(from var(--bg-angle), #10b981, #064e3b, #10b981) border-box; }
@@ -49,7 +48,7 @@
         <div class="w-64 bg-neutral-900 h-1 mb-4 overflow-hidden rounded-full">
             <div id="progressBar" class="bg-indigo-500 h-full w-0 transition-all duration-500"></div>
         </div>
-        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Initializing Wipe Sequences...</p>
+        <p class="text-[9px] font-black tracking-[0.5em] text-indigo-400 uppercase">Loading System Data...</p>
     </div>
 
     <aside id="sidebar">
@@ -57,7 +56,7 @@
              <h2 class="text-[9px] font-black text-neutral-600 uppercase tracking-widest">Database</h2>
         </div>
         <div id="deptList">
-            <button id="globalBtn" onclick="handleFilterChange('all', this)" class="dept-btn active">Global Grid</button>
+            <button onclick="handleFilterChange('all', this)" class="dept-btn active">Global Grid</button>
         </div>
     </aside>
 
@@ -138,7 +137,7 @@
 
         function animateNumber(el, target) {
             let start = 0;
-            const duration = 2000;
+            const duration = 1500;
             const startTime = performance.now();
             function update(now) {
                 const progress = Math.min((now - startTime) / duration, 1);
@@ -189,22 +188,15 @@
                 data: { labels: set.l, datasets: [{ data: set.v, backgroundColor: neonPalette, borderRadius: isBar ? 6 : 0, borderWidth: 0 }] },
                 options: {
                     responsive: true, maintainAspectRatio: false,
-                    // THE "TIMER WIPE" ANIMATION LOGIC
-                    animation: {
-                        duration: 3000,
-                        easing: 'easeInOutQuart'
+                    // PIE AND DOUGHNUT: ANIMATION REMOVED (Instant Load)
+                    animation: (type === 'pie' || type === 'doughnut') ? false : {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
                     },
-                    animations: {
-                        // For Pie/Doughnut: This forces the circle to wipe from 0% to 100%
-                        circumference: {
-                            from: 0,
-                            to: 360,
-                            duration: 3000,
-                            easing: 'easeInOutQuart'
-                        },
-                        // For Bars: Elevator rise effect
-                        y: isBar ? { from: 800, duration: 2000, easing: 'easeOutQuart' } : {}
-                    },
+                    // BAR CHART: Keep the subtle elevator rise
+                    animations: isBar ? {
+                        y: { from: 500, duration: 1000, easing: 'easeOutQuart' }
+                    } : {},
                     plugins: { 
                         legend: { display: !isBar, position: 'bottom', labels: { color: '#666', font: { size: 8 } } },
                         title: { display: true, text: title.toUpperCase(), color: '#fff', font: { size: 10, weight: '900' }, padding: 15 }
